@@ -22,8 +22,8 @@ locals {
 
 output "zones" {
   value = {
-  for environment, zones in local.zones_by_env :
-  environment => { for zone in zones : replace(zone.region, "-", "_") => zone }
+    for environment, zones in local.zones_by_env :
+    environment => { for zone in zones : replace(zone.region, "-", "_") => zone }
   }
 }
 
