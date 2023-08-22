@@ -34,36 +34,15 @@ resource "google_storage_bucket" "archive" {
   }
 }
 
-resource "google_project_iam_custom_role" "archive_object_writer" {
-  role_id     = "archive_object_writer"
-  title       = "Archive object writer role"
-  description = "Allows writing objects to the archive bucket"
-  permissions = [
-    "storage.objects.create",
-    "storage.multipartUploads.create",
-    "storage.multipartUploads.abort",
-    "storage.multipartUploads.listParts",
-  ]
-}
-
 resource "google_storage_bucket_iam_member" "archive_writer" {
   bucket = google_storage_bucket.archive.name
-  role   = google_project_iam_custom_role.archive_object_writer.id
+  role   = "${data.google_project.project.id}/roles/archive_object_writer"
   member = "serviceAccount:tenant-host@${data.google_project.project.project_id}.iam.gserviceaccount.com"
-}
-
-resource "google_project_iam_custom_role" "archive_object_deleter" {
-  role_id     = "archive_object_deleter"
-  title       = "Archive object deleter role"
-  description = "Archive object deleter role to grant object delete access"
-  permissions = [
-    "storage.objects.delete"
-  ]
 }
 
 resource "google_storage_bucket_iam_member" "archive_deleter" {
   bucket = google_storage_bucket.archive.name
-  role   = google_project_iam_custom_role.archive_object_deleter.id
+  role   = "${data.google_project.project.id}/roles/archive_object_deleter"
   member = "serviceAccount:tenant-host@${data.google_project.project.project_id}.iam.gserviceaccount.com"
   condition {
     title       = "files that are updated"
