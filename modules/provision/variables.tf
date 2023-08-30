@@ -5,6 +5,11 @@ variable "vespa_cloud_project" {
 }
 
 variable "tenant_name" {
-  description = "The tenant owner running Enclave account"
+  description = "The tenant owner running Enclave project"
   type        = string
+}
+
+variable "enable_ssh" {
+  description = "Grant Vespa operators SSH access to instances running in Enclave project"
+  type        = bool
 }

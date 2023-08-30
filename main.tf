@@ -15,4 +15,5 @@ module "provision" {
   source              = "./modules/provision"
   vespa_cloud_project = local.vespa_cloud_project
   tenant_name         = var.tenant_name
+  enable_ssh          = var.enable_ssh
 }
