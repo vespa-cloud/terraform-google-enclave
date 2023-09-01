@@ -31,3 +31,18 @@ module "zone_prod_europe_west3_b" {
     zone = module.enclave.zones.prod.gcp_europe_west3_b
 }
 ```
+
+# SSH
+
+To grant the Vespa Cloud operations team low-level SSH access to the hosts inside the Enclave through
+[GCP OS Login](https://cloud.google.com/compute/docs/oslogin), set `enable_ssh = true`.
+
+Only enable this if you explicitly wish to grant this access.
+
+```terraform
+module "enclave" {
+    source      = "vespa-cloud/enclave/gcp"
+    tenant_name = "<vespa cloud tenant>"
+    enable_ssh  = true
+}
+```

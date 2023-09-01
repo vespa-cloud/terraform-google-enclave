@@ -27,6 +27,6 @@ output "zones" {
   }
 }
 
-output "vespa_cloud_account" {
+output "vespa_cloud_project" {
   value = local.vespa_cloud_project
 }
