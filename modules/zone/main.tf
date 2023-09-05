@@ -145,7 +145,6 @@ resource "google_compute_firewall" "allow_wireguard_traffic" {
   name               = "${local.network_name}-firewall-allow-wireguard-traffic"
   network            = google_compute_network.vpc_network.name
   priority           = 2200
-  source_ranges      = ["::/0"]
   destination_ranges = [cidrsubnet(google_compute_subnetwork.subnetwork.external_ipv6_prefix, 0, 0)] # cidrsubnet() to normalize to avoid diff
 
   allow {
