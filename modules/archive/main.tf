@@ -9,17 +9,17 @@ terraform {
 data "google_project" "project" {}
 
 resource "random_string" "archive" {
-  length   = 6
-  special  = false
-  upper    = false
+  length  = 6
+  special = false
+  upper   = false
 }
 
 resource "google_storage_bucket" "archive" {
-  name          = "vespa-archive-${var.zone.environment}-${var.zone.gcp_zone}-${data.google_project.project.number}-${random_string.archive.id}"
-  location      = var.zone.gcp_region
-  force_destroy = false
+  name                        = "vespa-archive-${var.zone.environment}-${var.zone.gcp_zone}-${data.google_project.project.number}-${random_string.archive.id}"
+  location                    = var.zone.gcp_region
+  force_destroy               = false
   uniform_bucket_level_access = true
-  public_access_prevention = "enforced"
+  public_access_prevention    = "enforced"
   lifecycle_rule {
     condition {
       age = 31
