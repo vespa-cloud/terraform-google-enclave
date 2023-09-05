@@ -181,3 +181,24 @@ resource "google_service_account_iam_member" "vespa_ssh" {
   role               = "roles/iam.serviceAccountTokenCreator"
   member             = "serviceAccount:vespa-cloud-enclave-ssh@${var.vespa_cloud_project}.iam.gserviceaccount.com"
 }
+
+resource "google_project_iam_custom_role" "archive_object_writer" {
+  role_id     = "archive_object_writer"
+  title       = "Archive object writer role"
+  description = "Allows writing objects to the archive bucket"
+  permissions = [
+    "storage.objects.create",
+    "storage.multipartUploads.create",
+    "storage.multipartUploads.abort",
+    "storage.multipartUploads.listParts",
+  ]
+}
+
+resource "google_project_iam_custom_role" "archive_object_deleter" {
+  role_id     = "archive_object_deleter"
+  title       = "Archive object deleter role"
+  description = "Archive object deleter role to grant object delete access"
+  permissions = [
+    "storage.objects.delete"
+  ]
+}
