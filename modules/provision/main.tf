@@ -183,8 +183,8 @@ resource "google_service_account_iam_member" "vespa_ssh" {
 }
 
 resource "google_project_iam_custom_role" "archive_object_writer" {
-  role_id     = "archive_object_writer"
-  title       = "Archive object writer role"
+  role_id     = "archive_object_write"
+  title       = "Archive object write role"
   description = "Allows writing objects to the archive bucket"
   permissions = [
     "storage.objects.create",
@@ -195,9 +195,9 @@ resource "google_project_iam_custom_role" "archive_object_writer" {
 }
 
 resource "google_project_iam_custom_role" "archive_object_deleter" {
-  role_id     = "archive_object_deleter"
-  title       = "Archive object deleter role"
-  description = "Archive object deleter role to grant object delete access"
+  role_id     = "archive_object_delete"
+  title       = "Archive object delete role"
+  description = "Allow deleting from the archive bucket"
   permissions = [
     "storage.objects.delete"
   ]

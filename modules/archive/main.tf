@@ -34,15 +34,15 @@ resource "google_storage_bucket" "archive" {
   }
 }
 
-resource "google_storage_bucket_iam_member" "archive_writer" {
+resource "google_storage_bucket_iam_member" "archive_write" {
   bucket = google_storage_bucket.archive.name
-  role   = "${data.google_project.project.id}/roles/archive_object_writer"
+  role   = "${data.google_project.project.id}/roles/archive_object_write"
   member = "serviceAccount:tenant-host@${data.google_project.project.project_id}.iam.gserviceaccount.com"
 }
 
-resource "google_storage_bucket_iam_member" "archive_deleter" {
+resource "google_storage_bucket_iam_member" "archive_delete" {
   bucket = google_storage_bucket.archive.name
-  role   = "${data.google_project.project.id}/roles/archive_object_deleter"
+  role   = "${data.google_project.project.id}/roles/archive_object_delete"
   member = "serviceAccount:tenant-host@${data.google_project.project.project_id}.iam.gserviceaccount.com"
   condition {
     title       = "files that are updated"
