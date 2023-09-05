@@ -36,7 +36,7 @@ resource "google_storage_bucket" "archive" {
 
 resource "google_project_iam_custom_role" "archive_object_writer" {
   role_id     = "archive_object_writer_${var.zone.environment}_${replace(var.zone.gcp_zone, "-", "_")}"
-  title       = "Archive object writer role (${var.zone.environment} ${var.zone.gcp_zone})"
+  title       = "Archive object writer role"
   description = "Allows writing objects to the archive bucket"
   permissions = [
     "storage.objects.create",
@@ -54,7 +54,7 @@ resource "google_storage_bucket_iam_member" "archive_writer" {
 
 resource "google_project_iam_custom_role" "archive_object_deleter" {
   role_id     = "archive_object_deleter_${var.zone.environment}_${replace(var.zone.gcp_zone, "-", "_")}"
-  title       = "Archive object deleter role (${var.zone.environment} ${var.zone.gcp_zone})"
+  title       = "Archive object deleter role"
   description = "Archive object deleter role to grant object delete access"
   permissions = [
     "storage.objects.delete"
