@@ -7,8 +7,8 @@ terraform {
 }
 
 resource "google_project_service" "main_project_services" {
-  for_each = toset(["cloudkms", "cloudresourcemanager", "compute"])
-  service  = "${each.key}.googleapis.com"
+  for_each           = toset(["cloudkms", "cloudresourcemanager", "compute"])
+  service            = "${each.key}.googleapis.com"
   disable_on_destroy = false
 }
 
@@ -122,9 +122,11 @@ resource "google_service_account" "tenant_host" {
 # https://cloud.google.com/compute/docs/disks/customer-managed-encryption#before_you_begin
 data "google_project" "project" {}
 resource "google_project_iam_member" "compute_project" {
-  project  = data.google_project.project.project_id
-  role     = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
-  member   = "serviceAccount:service-${data.google_project.project.number}@compute-system.iam.gserviceaccount.com"
+  project = data.google_project.project.project_id
+  role    = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  member  = "serviceAccount:service-${data.google_project.project.number}@compute-system.iam.gserviceaccount.com"
+
+  depends_on = [google_project_service.main_project_services["compute"]]
 }
 
 # Health check for all tenant LBs
@@ -140,6 +142,8 @@ resource "google_compute_health_check" "tenant" {
     request_path = "/status.html"
     proxy_header = "PROXY_V1"
   }
+
+  depends_on = [google_project_service.main_project_services["compute"]]
 }
 
 # Vespa operator SSH access
@@ -172,8 +176,29 @@ resource "google_project_iam_binding" "vespa_ssh" {
 }
 
 resource "google_service_account_iam_member" "vespa_ssh" {
-  count = var.enable_ssh ? 1 : 0
+  count              = var.enable_ssh ? 1 : 0
   service_account_id = google_service_account.vespa_ssh.name
   role               = "roles/iam.serviceAccountTokenCreator"
   member             = "serviceAccount:vespa-cloud-enclave-ssh@${var.vespa_cloud_project}.iam.gserviceaccount.com"
+}
+
+resource "google_project_iam_custom_role" "archive_object_writer" {
+  role_id     = "archive_object_writer"
+  title       = "Archive object writer role"
+  description = "Allows writing objects to the archive bucket"
+  permissions = [
+    "storage.objects.create",
+    "storage.multipartUploads.create",
+    "storage.multipartUploads.abort",
+    "storage.multipartUploads.listParts",
+  ]
+}
+
+resource "google_project_iam_custom_role" "archive_object_deleter" {
+  role_id     = "archive_object_deleter"
+  title       = "Archive object deleter role"
+  description = "Archive object deleter role to grant object delete access"
+  permissions = [
+    "storage.objects.delete"
+  ]
 }

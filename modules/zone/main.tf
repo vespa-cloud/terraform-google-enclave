@@ -14,9 +14,9 @@ locals {
   # x.y.92.0/22   internal TCP proxies (ServiceConnect), in a separate declaration
   # x.y.96.0/20   proxy-use-only (ServiceConnect), in a separate declaration
   # x.y.128.0/17  tenants. Each host gets /96, first for the host and remainder for nodes
-  hosts_cidr_block   = cidrsubnet(var.zone_ipv4_cidr, 6, 0)
-  tenants_cidr_block = cidrsubnet(var.zone_ipv4_cidr, 1, 1)
-  proxy_cidr_block   = cidrsubnet(var.zone_ipv4_cidr, 4, 6)
+  hosts_cidr_block         = cidrsubnet(var.zone_ipv4_cidr, 6, 0)
+  tenants_cidr_block       = cidrsubnet(var.zone_ipv4_cidr, 1, 1)
+  proxy_cidr_block         = cidrsubnet(var.zone_ipv4_cidr, 4, 6)
   internal_tcp_proxy_block = cidrsubnet(var.zone_ipv4_cidr, 6, 23)
 }
 
@@ -70,7 +70,7 @@ resource "google_compute_subnetwork" "itcp_proxy_fe_subnetwork" {
   region        = var.zone.gcp_region
   network       = google_compute_network.vpc_network.id
 
-  private_ip_google_access = true
+  private_ip_google_access   = true
   private_ipv6_google_access = "ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE"
 
   log_config {

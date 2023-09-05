@@ -25,6 +25,8 @@ output "zones" {
     for environment, zones in local.zones_by_env :
     environment => { for zone in zones : replace(zone.region, "-", "_") => zone }
   }
+
+  depends_on = [module.provision]
 }
 
 output "vespa_cloud_project" {
