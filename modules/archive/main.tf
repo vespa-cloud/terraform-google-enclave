@@ -36,13 +36,13 @@ resource "google_storage_bucket" "archive" {
 
 resource "google_storage_bucket_iam_member" "archive_write" {
   bucket = google_storage_bucket.archive.name
-  role   = "${data.google_project.project.id}/roles/archive_object_write"
+  role   = var.zone.resource_ids["archive_role_write"]
   member = "serviceAccount:tenant-host@${data.google_project.project.project_id}.iam.gserviceaccount.com"
 }
 
 resource "google_storage_bucket_iam_member" "archive_delete" {
   bucket = google_storage_bucket.archive.name
-  role   = "${data.google_project.project.id}/roles/archive_object_delete"
+  role   = var.zone.resource_ids["archive_role_delete"]
   member = "serviceAccount:tenant-host@${data.google_project.project.project_id}.iam.gserviceaccount.com"
   condition {
     title       = "files that are updated"
