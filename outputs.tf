@@ -15,8 +15,12 @@ locals {
   ]
   zones_by_env = {
     for zone in local.all_zones :
-    zone.environment => merge(
-    { name = "${zone.environment}.${zone.gcp_zone}", region = "gcp-${zone.gcp_zone}", is_cd = var.is_cd }, zone)...
+    zone.environment => merge({
+      name         = "${zone.environment}.${zone.gcp_zone}",
+      region       = "gcp-${zone.gcp_zone}",
+      is_cd        = var.is_cd,
+      resource_ids = module.provision.resource_ids,
+    }, zone)...
   }
 }
 
