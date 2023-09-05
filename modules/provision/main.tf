@@ -125,6 +125,8 @@ resource "google_project_iam_member" "compute_project" {
   project  = data.google_project.project.project_id
   role     = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
   member   = "serviceAccount:service-${data.google_project.project.number}@compute-system.iam.gserviceaccount.com"
+
+	depends_on = [google_project_service.main_project_services["compute"]]
 }
 
 # Health check for all tenant LBs
@@ -140,6 +142,8 @@ resource "google_compute_health_check" "tenant" {
     request_path = "/status.html"
     proxy_header = "PROXY_V1"
   }
+
+	depends_on = [google_project_service.main_project_services["compute"]]
 }
 
 # Vespa operator SSH access
