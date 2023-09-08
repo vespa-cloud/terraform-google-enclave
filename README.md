@@ -22,12 +22,12 @@ module "enclave" {
 }
 
 module "zone_prod_us_central1_f" {
-    source = "vespa-cloud/enclave/google/modules/zone"
+    source = "vespa-cloud/enclave/google//modules/zone"
     zone = module.enclave.zones.prod.gcp_us_central1_f
 }
 
 module "zone_prod_europe_west3_b" {
-    source = "vespa-cloud/enclave/google/modules/zone"
+    source = "vespa-cloud/enclave/google//modules/zone"
     zone = module.enclave.zones.prod.gcp_europe_west3_b
 }
 ```
