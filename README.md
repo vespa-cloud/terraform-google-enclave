@@ -13,21 +13,21 @@ Then for each Enclave you want to host in your project - declare the
 Example use:
 ```terraform
 provider "google" {
-  project = "my-gcp-project"
+    project = "my-gcp-project"
 }
 
 module "enclave" {
-    source = "vespa-cloud/terraform-gcp-enclave"
+    source = "vespa-cloud/enclave/google"
     tenant_name = "vespa"
 }
 
 module "zone_prod_us_central1_f" {
-    source = "vespa-cloud/terraform-gcp-enclave/modules/zone"
+    source = "vespa-cloud/enclave/google/modules/zone"
     zone = module.enclave.zones.prod.gcp_us_central1_f
 }
 
 module "zone_prod_europe_west3_b" {
-    source = "vespa-cloud/terraform-gcp-enclave/modules/zone"
+    source = "vespa-cloud/enclave/google/modules/zone"
     zone = module.enclave.zones.prod.gcp_europe_west3_b
 }
 ```
@@ -41,7 +41,7 @@ Only enable this if you explicitly wish to grant this access.
 
 ```terraform
 module "enclave" {
-    source      = "vespa-cloud/enclave/gcp"
+    source      = "vespa-cloud/enclave/google"
     tenant_name = "<vespa cloud tenant>"
     enable_ssh  = true
 }
