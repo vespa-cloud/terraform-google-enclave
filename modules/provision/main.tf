@@ -28,6 +28,7 @@ resource "google_project_iam_custom_role" "vespa_cloud_provisioner_role" {
 
     # Provision instance
     "compute.disks.create",
+    "compute.disks.setLabels",
     "compute.forwardingRules.setLabels",
     "compute.instances.attachDisk",
     "compute.instances.create",
