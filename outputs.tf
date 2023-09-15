@@ -1,5 +1,6 @@
 
 locals {
+  template_version = "1_0_1" # '.' not allowed in labels
   all_zones = var.is_cd ? [
     { environment = "dev", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
     { environment = "test", gcp_region = "us-central1", gcp_zone = "us-central1-f", },
@@ -16,10 +17,11 @@ locals {
   zones_by_env = {
     for zone in local.all_zones :
     zone.environment => merge({
-      name         = "${zone.environment}.${zone.gcp_zone}",
-      region       = "gcp-${zone.gcp_zone}",
-      is_cd        = var.is_cd,
-      resource_ids = module.provision.resource_ids,
+      name             = "${zone.environment}.${zone.gcp_zone}",
+      region           = "gcp-${zone.gcp_zone}",
+      is_cd            = var.is_cd,
+      resource_ids     = module.provision.resource_ids,
+      template_version = local.template_version,
     }, zone)...
   }
 }
