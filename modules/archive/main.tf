@@ -30,7 +30,8 @@ resource "google_storage_bucket" "archive" {
   }
 
   labels = {
-    managedby = "vespa-cloud"
+    managedby              = "vespa-cloud"
+    vespa_template_version = var.zone.template_version
   }
 }
 
