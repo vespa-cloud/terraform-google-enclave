@@ -1,6 +1,7 @@
 
 locals {
-  template_version = "1_0_1" # '.' not allowed in labels
+  # major_minor_patch: major incremented on breaking changes, while patches are risk-free or important security fixes.
+  template_version = "1_0_2"
   all_zones = var.is_cd ? [
     { environment = "dev", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
     { environment = "test", gcp_region = "us-central1", gcp_zone = "us-central1-f", },
