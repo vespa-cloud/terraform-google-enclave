@@ -1,27 +1,12 @@
-
 locals {
   # major_minor_patch: major incremented on breaking changes, while patches are risk-free or important security fixes.
-  template_version = "1_0_4"
-  all_zones = var.is_cd ? [
-    { environment = "dev", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
-    { environment = "test", gcp_region = "us-central1", gcp_zone = "us-central1-f", },
-    { environment = "staging", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
-    { environment = "prod", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
-    ] : [
-    { environment = "dev", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
-    { environment = "test", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
-    { environment = "staging", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
-    { environment = "perf", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
-    { environment = "prod", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
-    { environment = "prod", gcp_region = "europe-west3", gcp_zone = "europe-west3-b" },
-  ]
+  template_version = "1_0_5"
   zones_by_env = {
-    for zone in local.all_zones :
+    for zone in var.all_zones :
     zone.environment => merge({
       name             = "${zone.environment}.${zone.gcp_zone}",
       region           = "gcp-${zone.gcp_zone}",
-      is_cd            = var.is_cd,
-      resource_ids     = module.provision.resource_ids,
+      resource_ids     = local.resource_ids,
       template_version = local.template_version,
     }, zone)...
   }
@@ -33,9 +18,14 @@ output "zones" {
     environment => { for zone in zones : replace(zone.region, "-", "_") => zone }
   }
 
-  depends_on = [module.provision]
+  # Zone creation depends on these resources
+  depends_on = [
+    google_service_account.tenant_host,
+    google_project_iam_custom_role.archive_object_write,
+    google_project_iam_custom_role.archive_object_delete
+  ]
 }
 
 output "vespa_cloud_project" {
-  value = local.vespa_cloud_project
+  value = var.vespa_cloud_project
 }

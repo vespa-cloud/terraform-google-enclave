@@ -25,6 +25,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Checkov
-        uses: bridgecrewio/checkov-action@master
+        uses: bridgecrewio/checkov-action@v12
         with:
           framework: terraform
