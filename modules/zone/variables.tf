@@ -8,7 +8,6 @@ variable "zone" {
     gcp_zone         = string,
     name             = string,
     resource_ids     = map(any),
-    is_cd            = bool,
     template_version = string,
   })
 }
