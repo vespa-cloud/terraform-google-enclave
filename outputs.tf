@@ -18,7 +18,9 @@ output "zones" {
     environment => { for zone in zones : replace(zone.region, "-", "_") => zone }
   }
 
+  # Zone creation depends on these resources
   depends_on = [
+    google_service_account.tenant_host,
     google_project_iam_custom_role.archive_object_write,
     google_project_iam_custom_role.archive_object_delete
   ]
