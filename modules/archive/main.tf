@@ -48,6 +48,6 @@ resource "google_storage_bucket_iam_member" "archive_delete" {
   condition {
     title       = "files that are updated"
     description = "Limit delete to files that are updated"
-    expression  = "resource.name.endsWith(\"/vespa.log.zst\") || resource.name.endsWith(\"/zookeeper.log.zst\")"
+    expression  = "resource.name.endsWith(\"/vespa.log.zst\") || resource.name.endsWith(\"/zookeeper.log.zst\") || resource.name.endsWith(\"/nginx-error.log.zst\")"
   }
 }
