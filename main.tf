@@ -116,6 +116,25 @@ resource "google_project_iam_member" "vespa_cloud_provisioner" {
   member  = "serviceAccount:vespa-cloud-provisioner@${var.vespa_cloud_project}.iam.gserviceaccount.com"
 }
 
+resource "google_project_iam_custom_role" "service_connector" {
+  role_id     = "service_connect_dns_updater"
+  title       = "ServiceConnect maintainer role"
+  description = "Role for reading and updating ServiceConnect data"
+  permissions = [
+    "compute.forwardingRules.use",
+    "compute.regionOperations.get",
+    "compute.serviceAttachments.create",
+    "compute.serviceAttachments.delete",
+    "compute.serviceAttachments.get",
+    "compute.subnetworks.use",
+  ]
+}
+resource "google_project_iam_member" "service_connector" {
+  project = google_project_iam_custom_role.service_connector.project
+  role    = google_project_iam_custom_role.service_connector.id
+  member  = "serviceAccount:service-connector@${var.vespa_cloud_project}.iam.gserviceaccount.com"
+}
+
 resource "google_service_account" "tenant_host" {
   depends_on = [google_project_service.main_project_services["cloudresourcemanager"]]
   account_id = "tenant-host"
