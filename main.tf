@@ -176,6 +176,7 @@ resource "google_project_iam_custom_role" "vespa_ssh" {
     "compute.instances.get",
     "compute.instances.osAdminLogin",
     "compute.instances.osLogin",
+    "compute.instances.setMetadata",
     "compute.instances.use",
     "compute.projects.get",
     "compute.regions.get",
