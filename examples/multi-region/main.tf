@@ -14,6 +14,8 @@ module "enclave" {
   source      = "vespa-cloud/enclave/google"
   version     = ">= 1.0.0, < 2.0.0"
   tenant_name = "<YOUR-TENANT-HERE>"
+  # Uncomment to enable SSH access for the Vespa team
+  # enable_ssh = true
 }
 
 #
