@@ -10,3 +10,7 @@ output "hosts_ipv6_cidr_block" {
 output "hosts_subnet_id" {
   value = google_compute_subnetwork.subnetwork.id
 }
+output "archive_bucket" {
+  description = "Name of Vespa Cloud Enclave archive bucket"
+  value       = module.archive.bucket
+}
