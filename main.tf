@@ -31,6 +31,7 @@ resource "google_project_iam_custom_role" "vespa_cloud_provisioner_role" {
     "compute.instances.setServiceAccount",
     "compute.instances.setTags",
     "compute.instances.updateNetworkInterface",
+    "compute.machineTypes.list",
     "compute.subnetworks.use",
     "iam.serviceAccounts.actAs",
 
