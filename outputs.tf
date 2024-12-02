@@ -13,6 +13,7 @@ locals {
 }
 
 output "zones" {
+  description = "Available zones are listed at https://cloud.vespa.ai/en/reference/zones.html . You reference a zone with `[environment].[region with - replaced by _]` (e.g `prod.gcp-us-central-1f`)."
   value = {
     for environment, zones in local.zones_by_env :
     environment => { for zone in zones : replace(zone.region, "-", "_") => zone }
@@ -27,5 +28,6 @@ output "zones" {
 }
 
 output "vespa_cloud_project" {
-  value = var.vespa_cloud_project
+  description = "The Vespa Cloud GCP project used to manage enclave accounts"
+  value       = var.vespa_cloud_project
 }
