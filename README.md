@@ -11,6 +11,7 @@ Then for each Enclave you want to host in your project - declare the
 `zone` module for each Vespa Cloud zone you need.  
 
 Example use:
+
 ```terraform
 provider "google" {
     project = "my-gcp-project"
@@ -24,11 +25,20 @@ module "enclave" {
 module "zone_prod_us_central1_f" {
     source = "vespa-cloud/enclave/google//modules/zone"
     zone = module.enclave.zones.prod.gcp_us_central1_f
+
+    archive_reader_members = [
+        # Members allowed to read objects in the storage archive.
+        # Members are on the format described here: https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam#argument-reference
+    ]
 }
 
 module "zone_prod_europe_west3_b" {
     source = "vespa-cloud/enclave/google//modules/zone"
     zone = module.enclave.zones.prod.gcp_europe_west3_b
+
+    archive_reader_members = [
+        # Members allowed to read objects in the storage archive.
+    ]
 }
 ```
 
