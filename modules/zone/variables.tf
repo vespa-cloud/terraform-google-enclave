@@ -21,3 +21,9 @@ variable "zone_ipv4_cidr" {
     error_message = "CIDR for the zone network must be /16 and must be within 10.0.0.0/8"
   }
 }
+
+variable "archive_reader_members" {
+  description = "List of members allowed to read archive bucket in the format `type:principal`. See https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam#argument-reference for more details."
+  type        = list(string)
+  default     = []
+}

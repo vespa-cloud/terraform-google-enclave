@@ -51,3 +51,15 @@ resource "google_storage_bucket_iam_member" "archive_delete" {
     expression  = "resource.name.endsWith(\"/vespa.log.zst\") || resource.name.endsWith(\"/zookeeper.log.zst\") || resource.name.endsWith(\"/nginx-error.log.zst\")"
   }
 }
+
+resource "google_storage_bucket_iam_member" "archive_reader" {
+  for_each = toset(var.reader_members)
+  bucket   = google_storage_bucket.archive.name
+  role     = var.zone.resource_ids["archive_role_delete"]
+  member   = each.value
+  condition {
+    title       = "files that are updated"
+    description = "Limit delete to files that are updated"
+    expression  = "resource.name.endsWith(\"/vespa.log.zst\") || resource.name.endsWith(\"/zookeeper.log.zst\") || resource.name.endsWith(\"/nginx-error.log.zst\")"
+  }
+}

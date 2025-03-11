@@ -21,8 +21,9 @@ locals {
 }
 
 module "archive" {
-  source = "../archive"
-  zone   = var.zone
+  source         = "../archive"
+  zone           = var.zone
+  reader_members = var.archive_reader_members
 }
 
 resource "google_compute_network" "vpc_network" {

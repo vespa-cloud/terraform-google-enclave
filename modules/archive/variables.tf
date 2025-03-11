@@ -11,3 +11,9 @@ variable "zone" {
     template_version = string,
   })
 }
+
+variable "reader_members" {
+  description = "List of members allowed to read archive bucket in the format `type:principal`. See https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam#argument-reference for more details."
+  type        = list(string)
+  default     = []
+}
