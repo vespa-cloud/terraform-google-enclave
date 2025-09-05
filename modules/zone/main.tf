@@ -142,19 +142,6 @@ resource "google_compute_firewall" "allow_internal_ipv6_traffic" {
   }
 }
 
-resource "google_compute_firewall" "allow_wireguard" {
-  name               = "${local.network_name}-firewall-allow-wireguard"
-  network            = google_compute_network.vpc_network.name
-  priority           = 10100
-  source_ranges      = ["::/0"]
-  destination_ranges = [cidrsubnet(google_compute_subnetwork.subnetwork.external_ipv6_prefix, 0, 0)] # cidrsubnet() to normalize to avoid diff
-
-  allow {
-    protocol = "udp"
-    ports    = [51820]
-  }
-}
-
 resource "google_compute_firewall" "allow_ssh" {
   name          = "${local.network_name}-firewall-allow-ssh"
   network       = google_compute_network.vpc_network.name
