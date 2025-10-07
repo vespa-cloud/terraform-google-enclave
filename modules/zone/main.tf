@@ -110,12 +110,14 @@ resource "google_compute_router" "nat" {
 }
 
 resource "google_compute_router_nat" "nat" {
-  name                               = google_compute_router.nat.name
-  router                             = google_compute_router.nat.name
-  region                             = google_compute_router.nat.region
-  nat_ip_allocate_option             = "MANUAL_ONLY"
-  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
-  nat_ips                            = [google_compute_address.router_eip.id]
+  name                                = google_compute_router.nat.name
+  router                              = google_compute_router.nat.name
+  region                              = google_compute_router.nat.region
+  nat_ip_allocate_option              = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat  = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+  nat_ips                             = [google_compute_address.router_eip.id]
+  enable_dynamic_port_allocation      = true
+  enable_endpoint_independent_mapping = false
 }
 
 resource "google_compute_firewall" "allow_internal_traffic" {
