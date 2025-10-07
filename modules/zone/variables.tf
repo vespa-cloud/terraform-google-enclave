@@ -27,3 +27,9 @@ variable "archive_reader_members" {
   type        = list(string)
   default     = []
 }
+
+variable "nat_static_ip_count" {
+  description = "Number of static IPs to reserve for NAT gateways. Set to 0 to use ephemeral/dynamic IPs."
+  type        = number
+  default     = 0
+}
