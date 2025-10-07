@@ -111,15 +111,33 @@ resource "google_compute_router" "nat" {
   network = google_compute_network.vpc_network.id
 }
 
-resource "google_compute_router_nat" "nat" {
+# NAT with static IPs - used when nat_static_ip_count > 0
+resource "google_compute_router_nat" "nat_static" {
+  count = var.nat_static_ip_count
+
   name                               = google_compute_router.nat.name
   router                             = google_compute_router.nat.name
   region                             = google_compute_router.nat.region
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 
   nat_ips                             = google_compute_address.router_eip[*].id
-  nat_ip_allocate_option              = var.nat_static_ip_count > 0 ? "MANUAL_ONLY" : "AUTO_ONLY"
-  enable_endpoint_independent_mapping = (var.nat_static_ip_count > 0) # Endpoint independent mapping only works with static IPs
+  nat_ip_allocate_option              = "MANUAL_ONLY"
+  enable_endpoint_independent_mapping = true
+
+  enable_dynamic_port_allocation = true
+}
+
+# NAT with dynamic IPs - used when nat_static_ip_count = 0
+resource "google_compute_router_nat" "nat_dynamic" {
+  count = var.nat_static_ip_count == 0 ? 1 : 0
+
+  name                               = google_compute_router.nat.name
+  router                             = google_compute_router.nat.name
+  region                             = google_compute_router.nat.region
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+
+  nat_ip_allocate_option              = "AUTO_ONLY"
+  enable_endpoint_independent_mapping = false # Not supported with dynamic IPs
 
   enable_dynamic_port_allocation = true
 }
