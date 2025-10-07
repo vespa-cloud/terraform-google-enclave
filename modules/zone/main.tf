@@ -97,6 +97,8 @@ resource "google_compute_region_health_check" "tenant_health_check" {
 }
 
 resource "google_compute_address" "router_eip" {
+  count = var.nat_static_ip_count
+
   name         = "${local.network_name}-eip-nat-gw"
   region       = var.zone.gcp_region
   address_type = "EXTERNAL"
@@ -110,14 +112,16 @@ resource "google_compute_router" "nat" {
 }
 
 resource "google_compute_router_nat" "nat" {
-  name                                = google_compute_router.nat.name
-  router                              = google_compute_router.nat.name
-  region                              = google_compute_router.nat.region
-  nat_ip_allocate_option              = "AUTO_ONLY"
-  source_subnetwork_ip_ranges_to_nat  = "ALL_SUBNETWORKS_ALL_IP_RANGES"
-  nat_ips                             = [google_compute_address.router_eip.id]
-  enable_dynamic_port_allocation      = true
-  enable_endpoint_independent_mapping = false
+  name                               = google_compute_router.nat.name
+  router                             = google_compute_router.nat.name
+  region                             = google_compute_router.nat.region
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+
+  nat_ips                             = google_compute_address.router_eip[*].id
+  nat_ip_allocate_option              = var.nat_static_ip_count > 0 ? "MANUAL_ONLY" : "AUTO_ONLY"
+  enable_endpoint_independent_mapping = (var.nat_static_ip_count > 0) # Endpoint independent mapping only works with static IPs
+
+  enable_dynamic_port_allocation = true
 }
 
 resource "google_compute_firewall" "allow_internal_traffic" {
