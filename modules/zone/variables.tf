@@ -29,7 +29,13 @@ variable "archive_reader_members" {
 }
 
 variable "nat_static_ip_count" {
-  description = "Number of static IPs to reserve for NAT gateways. Set to 0 to use ephemeral/dynamic IPs. Changing this value will cause NAT gateway recreation and brief service interruption."
+  description =<<-EOT
+    Number of static IPs to reserve for NAT gateways.
+
+    Set to 0 to use ephemeral/dynamic IPs.
+    Important: Changing this value between 0 and a positive number (or vice versa) will trigger the replacement of the NAT gateway, which will cause a brief outage of outbound connectivity from the zone.
+  EOT
+
   type        = number
   default     = 0
 }
