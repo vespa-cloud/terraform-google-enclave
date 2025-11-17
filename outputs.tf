@@ -1,6 +1,6 @@
 locals {
   # major_minor_patch: major incremented on breaking changes, while patches are risk-free or important security fixes.
-  template_version = "1_3_0"
+  template_version = "1_3_1"
   zones_by_env = {
     for zone in var.all_zones :
     zone.environment => merge({
@@ -30,4 +30,9 @@ output "zones" {
 output "vespa_cloud_project" {
   description = "The Vespa Cloud GCP project used to manage enclave accounts"
   value       = var.vespa_cloud_project
+}
+
+output "tenant_host_serviceaccount" {
+  description = "Email address of the service account used to launch tenant VMs"
+  value       = google_service_account.tenant_host.email
 }
