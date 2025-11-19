@@ -27,6 +27,9 @@ variable "all_zones" {
     { environment = "test", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
     { environment = "staging", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
     { environment = "perf", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
+    { environment = "prod", gcp_region = "us-central1", gcp_zone = "us-central1-a" },
+    { environment = "prod", gcp_region = "us-central1", gcp_zone = "us-central1-b" },
+    { environment = "prod", gcp_region = "us-central1", gcp_zone = "us-central1-c" },
     { environment = "prod", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
     { environment = "prod", gcp_region = "europe-west3", gcp_zone = "europe-west3-b" },
   ]
