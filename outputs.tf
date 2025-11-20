@@ -31,3 +31,8 @@ output "vespa_cloud_project" {
   description = "The Vespa Cloud GCP project used to manage enclave accounts"
   value       = var.vespa_cloud_project
 }
+
+output "tenant_host_serviceaccount" {
+  description = "Email address of the service account used to launch tenant VMs"
+  value       = google_service_account.tenant_host.email
+}
