@@ -5,7 +5,7 @@ locals {
       name             = "${zone.environment}.${zone.gcp_zone}",
       region           = "gcp-${zone.gcp_zone}",
       resource_ids     = local.resource_ids,
-      template_version = local.template_version,
+      template_version = local.template_version_gcp,
     }, zone)...
   }
 }
