@@ -227,6 +227,10 @@ resource "google_project_iam_custom_role" "archive_object_delete" {
 }
 
 locals {
+  # NOTE: Do not rename or move this variable!
+  # Used by github actions to tag releases. Bump for non-trivial changes.
+  template_version = "1.4.0"
+
   resource_ids = {
     archive_role_write  = google_project_iam_custom_role.archive_object_write.id,
     archive_role_delete = google_project_iam_custom_role.archive_object_delete.id

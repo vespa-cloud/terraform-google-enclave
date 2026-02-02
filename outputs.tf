@@ -1,6 +1,4 @@
 locals {
-  # major_minor_patch: major incremented on breaking changes, while patches are risk-free or important security fixes.
-  template_version = "1_4_0"
   zones_by_env = {
     for zone in var.all_zones :
     zone.environment => merge({
