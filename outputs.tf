@@ -1,13 +1,11 @@
 locals {
-  # major_minor_patch: major incremented on breaking changes, while patches are risk-free or important security fixes.
-  template_version = "1_4_0"
   zones_by_env = {
     for zone in var.all_zones :
     zone.environment => merge({
       name             = "${zone.environment}.${zone.gcp_zone}",
       region           = "gcp-${zone.gcp_zone}",
       resource_ids     = local.resource_ids,
-      template_version = local.template_version,
+      template_version = local.template_version_gcp,
     }, zone)...
   }
 }
