@@ -229,7 +229,7 @@ resource "google_project_iam_custom_role" "archive_object_delete" {
 locals {
   # NOTE: Do not rename or move this variable!
   # Used by github actions to tag releases. Bump for non-trivial changes.
-  template_version     = "1.4.0"
+  template_version     = "1.5.0"
   template_version_gcp = replace(local.template_version, ".", "_")
 
   resource_ids = {

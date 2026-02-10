@@ -30,6 +30,7 @@ variable "all_zones" {
     { environment = "prod", gcp_region = "us-central1", gcp_zone = "us-central1-b" },
     { environment = "prod", gcp_region = "us-central1", gcp_zone = "us-central1-c" },
     { environment = "prod", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
+    { environment = "prod", gcp_region = "us-east4", gcp_zone = "us-east4-c" },
     { environment = "prod", gcp_region = "europe-west3", gcp_zone = "europe-west3-b" },
 
     # deprecated in favor of dev zone - remove when bumping module to 2.x
