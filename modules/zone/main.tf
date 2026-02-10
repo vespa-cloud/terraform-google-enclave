@@ -7,7 +7,7 @@ terraform {
 }
 
 locals {
-  network_name = "${var.zone.environment}-${var.zone.gcp_zone}"
+  zone_name = "${var.zone.environment}-${var.zone.gcp_zone}"
 
   # x.y.0.0/16    VPC
   # x.y.0.0/22    tenant hosts
@@ -26,16 +26,11 @@ module "archive" {
   reader_members = var.archive_reader_members
 }
 
-resource "google_compute_network" "vpc_network" {
-  name                    = local.network_name
-  auto_create_subnetworks = false
-}
-
 resource "google_compute_subnetwork" "subnetwork" {
-  name          = "${local.network_name}-subnet-tenant-host"
+  name          = "${local.zone_name}-subnet-tenant-host"
   ip_cidr_range = local.hosts_cidr_block
   region        = var.zone.gcp_region
-  network       = google_compute_network.vpc_network.id
+  network       = var.zone.globals.vpc_id
 
   stack_type                 = "IPV4_IPV6"
   ipv6_access_type           = "EXTERNAL"
@@ -57,19 +52,19 @@ resource "google_compute_subnetwork" "subnetwork" {
 resource "google_compute_subnetwork" "tcp_proxy_only_subnetwork" {
   # checkov:skip=CKV_GCP_74:TCP proxy subnetwork is used for ServiceConnect
   # checkov:skip=CKV_GCP_76:TCP proxy subnetwork is used for ServiceConnect
-  name          = "${local.network_name}-subnet-tcp-proxy-only"
+  name          = "${local.zone_name}-subnet-tcp-proxy-only"
   ip_cidr_range = local.proxy_cidr_block
   region        = var.zone.gcp_region
-  network       = google_compute_network.vpc_network.id
+  network       = var.zone.globals.vpc_id
   purpose       = "REGIONAL_MANAGED_PROXY"
   role          = "ACTIVE"
 }
 
 resource "google_compute_subnetwork" "itcp_proxy_fe_subnetwork" {
-  name          = "${local.network_name}-subnet-itcp-proxy-fe"
+  name          = "${local.zone_name}-subnet-itcp-proxy-fe"
   ip_cidr_range = local.internal_tcp_proxy_block
   region        = var.zone.gcp_region
-  network       = google_compute_network.vpc_network.id
+  network       = var.zone.globals.vpc_id
 
   private_ip_google_access   = true
   private_ipv6_google_access = "ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE"
@@ -82,7 +77,7 @@ resource "google_compute_subnetwork" "itcp_proxy_fe_subnetwork" {
 }
 
 resource "google_compute_region_health_check" "tenant_health_check" {
-  name   = "${local.network_name}-healthcheck-tenant"
+  name   = "${local.zone_name}-healthcheck-tenant"
   region = var.zone.gcp_region
 
   check_interval_sec  = 10
@@ -96,56 +91,10 @@ resource "google_compute_region_health_check" "tenant_health_check" {
   }
 }
 
-resource "google_compute_address" "router_eip" {
-  count = var.nat_static_ip_count
-
-  name         = "${local.network_name}-eip-nat-gw"
-  region       = var.zone.gcp_region
-  address_type = "EXTERNAL"
-  network_tier = "PREMIUM" # Must use premium for router
-}
-
-resource "google_compute_router" "nat" {
-  name    = "${local.network_name}-router-nat-gw"
-  region  = var.zone.gcp_region
-  network = google_compute_network.vpc_network.id
-}
-
-# NAT with static IPs - used when nat_static_ip_count > 0
-resource "google_compute_router_nat" "nat_static" {
-  count = var.nat_static_ip_count
-
-  name                               = google_compute_router.nat.name
-  router                             = google_compute_router.nat.name
-  region                             = google_compute_router.nat.region
-  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
-
-  nat_ips                             = google_compute_address.router_eip[*].id
-  nat_ip_allocate_option              = "MANUAL_ONLY"
-  enable_endpoint_independent_mapping = true
-
-  enable_dynamic_port_allocation = true
-}
-
-# NAT with dynamic IPs - used when nat_static_ip_count = 0
-resource "google_compute_router_nat" "nat_dynamic" {
-  count = var.nat_static_ip_count == 0 ? 1 : 0
-
-  name                               = google_compute_router.nat.name
-  router                             = google_compute_router.nat.name
-  region                             = google_compute_router.nat.region
-  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
-
-  nat_ip_allocate_option              = "AUTO_ONLY"
-  enable_endpoint_independent_mapping = false # Not supported with dynamic IPs
-
-  enable_dynamic_port_allocation = true
-}
-
 resource "google_compute_firewall" "allow_internal_traffic" {
   #checkov:skip=CKV2_GCP_12:Communication internally on the private network is allowed
-  name          = "${local.network_name}-firewall-allow-internal-traffic"
-  network       = google_compute_network.vpc_network.name
+  name          = "${local.zone_name}-firewall-allow-internal-traffic"
+  network       = var.zone.globals.vpc_name
   priority      = 2000
   source_ranges = [var.zone_ipv4_cidr]
 
@@ -156,8 +105,8 @@ resource "google_compute_firewall" "allow_internal_traffic" {
 
 resource "google_compute_firewall" "allow_internal_ipv6_traffic" {
   #checkov:skip=CKV2_GCP_12:Communication internally on the private network is allowed
-  name          = "${local.network_name}-firewall-allow-internal-ipv6-traffic"
-  network       = google_compute_network.vpc_network.name
+  name          = "${local.zone_name}-firewall-allow-internal-ipv6-traffic"
+  network       = var.zone.globals.vpc_name
   priority      = 2100
   source_ranges = [cidrsubnet(google_compute_subnetwork.subnetwork.external_ipv6_prefix, 0, 0)] # cidrsubnet() to normalize to avoid diff
 
@@ -167,8 +116,8 @@ resource "google_compute_firewall" "allow_internal_ipv6_traffic" {
 }
 
 resource "google_compute_firewall" "allow_ssh" {
-  name          = "${local.network_name}-firewall-allow-ssh"
-  network       = google_compute_network.vpc_network.name
+  name          = "${local.zone_name}-firewall-allow-ssh"
+  network       = var.zone.globals.vpc_name
   priority      = 10000
   source_ranges = ["35.235.240.0/20"] # https://cloud.google.com/iap/docs/using-tcp-forwarding#create-firewall-rule
 
@@ -180,8 +129,8 @@ resource "google_compute_firewall" "allow_ssh" {
 
 # allow access from health check ranges
 resource "google_compute_firewall" "allow_health_check" {
-  name          = "${local.network_name}-firewall-allow-health-check"
-  network       = google_compute_network.vpc_network.id
+  name          = "${local.zone_name}-firewall-allow-health-check"
+  network       = var.zone.globals.vpc_id
   source_ranges = ["130.211.0.0/22", "35.191.0.0/16"] # https://cloud.google.com/load-balancing/docs/https#health-checks
 
   allow {
@@ -191,7 +140,7 @@ resource "google_compute_firewall" "allow_health_check" {
 }
 
 resource "google_kms_key_ring" "disk" {
-  name     = "${local.network_name}-vespa-cloud-disk-key"
+  name     = "${local.zone_name}-vespa-cloud-disk-key"
   location = var.zone.gcp_region
 }
 

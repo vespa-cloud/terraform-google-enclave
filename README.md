@@ -43,7 +43,7 @@ Authentication: configure the Google provider using any supported auth method (C
 Workload Identity). See https://registry.terraform.io/providers/hashicorp/google/latest/docs/guides/getting_started
 
 ## Usage
-Minimal example (you must add at least one zone submodule):
+Minimal example:
 
 ```hcl
 provider "google" {
@@ -57,11 +57,18 @@ module "enclave" {
   tenant_name = "<YOUR-VESPA-TENANT-NAME>"
 }
 
-# Create one Vespa Cloud zone (VPC, subnets, firewall, KMS, Cloud Storage, etc.)
+# Create regional Cloud NAT (required for each GCP region)
+module "region_us_central1" {
+  source  = "vespa-cloud/enclave/google//modules/region"
+  version = ">= 1.0.0, < 2.0.0"
+  region  = module.enclave.regions.us_central1
+}
+
+# Create zone-specific networking (one per Vespa zone)
 module "zone_dev_us_central1_f" {
   source  = "vespa-cloud/enclave/google//modules/zone"
   version = ">= 1.0.0, < 2.0.0"
-  zone    = module.enclave.zones.dev.gcp_us_central1_f
+  zone    = module.region_us_central1.zones.dev.gcp_us_central1_f
 
   archive_reader_members = [
     # Members allowed to read objects in the Cloud Storage archive.
@@ -93,13 +100,12 @@ See complete working examples in `examples/`.
 ## Outputs
 - `zones` (map): Map of available Vespa Cloud zones grouped by environment. Keys are referenced as
   `[environment].[region with - replaced by _]`, for example: `prod.gcp_us_central1_f` or `dev.gcp_us_central1_f`.
-  Each zone object contains:
+  Each zone object contains the following public members:
   - `name`: Full Vespa Cloud zone name (e.g. `prod.us-central1-f`)
   - `region`: Vespa region id (e.g. `gcp-us-central1-f`)
   - `gcp_region`: GCP region (e.g. `us-central1`)
   - `gcp_zone`: GCP zone (e.g. `us-central1-f`)
   - `template_version`: Module template version
-  - `resource_ids`: Map of resource IDs needed by zone submodules
 
 - `vespa_cloud_project` (string): The Vespa Cloud GCP project used to manage enclave accounts.
 

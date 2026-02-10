@@ -1,6 +1,3 @@
-output "network_name" {
-  value = google_compute_network.vpc_network.name
-}
 output "hosts_cidr_block" {
   value = local.hosts_cidr_block
 }
