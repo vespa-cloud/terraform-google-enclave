@@ -9,5 +9,5 @@ output "hosts_subnet_id" {
 }
 output "archive_bucket" {
   description = "Name of Vespa Cloud Enclave archive bucket"
-  value       = module.archive.bucket
+  value       = google_storage_bucket.archive.name
 }
