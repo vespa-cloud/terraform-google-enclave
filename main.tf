@@ -4,12 +4,6 @@ resource "google_project_service" "main_project_services" {
   disable_on_destroy = false
 }
 
-# Global VPC shared across all environments and zones
-resource "google_compute_network" "vespa" {
-  name                    = "vespa"
-  auto_create_subnetworks = false
-}
-
 resource "google_project_iam_custom_role" "vespa_cloud_provisioner_role" {
   role_id     = "vespa.cloud.provisioner"
   title       = "Allow config servers to provision resources"

@@ -62,21 +62,6 @@ resource "google_compute_subnetwork" "itcp_proxy_fe_subnetwork" {
   }
 }
 
-resource "google_compute_region_health_check" "tenant_health_check" {
-  name   = "${local.zone_name}-healthcheck-tenant"
-  region = var.zone.gcp_region
-
-  check_interval_sec  = 10
-  healthy_threshold   = 2
-  unhealthy_threshold = 2
-
-  https_health_check {
-    port         = 4443
-    request_path = "/status.html"
-    proxy_header = "PROXY_V1"
-  }
-}
-
 resource "google_compute_firewall" "allow_internal_traffic" {
   #checkov:skip=CKV2_GCP_12:Communication internally on the private network is allowed
   name          = "${local.zone_name}-firewall-allow-internal-traffic"
@@ -98,29 +83,5 @@ resource "google_compute_firewall" "allow_internal_ipv6_traffic" {
 
   allow {
     protocol = "all"
-  }
-}
-
-resource "google_compute_firewall" "allow_ssh" {
-  name          = "${local.zone_name}-firewall-allow-ssh"
-  network       = var.zone.globals.vpc_name
-  priority      = 10000
-  source_ranges = ["35.235.240.0/20"] # https://cloud.google.com/iap/docs/using-tcp-forwarding#create-firewall-rule
-
-  allow {
-    protocol = "tcp"
-    ports    = [22]
-  }
-}
-
-# allow access from health check ranges
-resource "google_compute_firewall" "allow_health_check" {
-  name          = "${local.zone_name}-firewall-allow-health-check"
-  network       = var.zone.globals.vpc_id
-  source_ranges = ["130.211.0.0/22", "35.191.0.0/16"] # https://cloud.google.com/load-balancing/docs/https#health-checks
-
-  allow {
-    protocol = "tcp"
-    ports    = [4443]
   }
 }
