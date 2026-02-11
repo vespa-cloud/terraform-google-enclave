@@ -24,20 +24,4 @@ module "zone_dev_us_central1_f" {
 
 ## Inputs
 
-- `region` (object, required): GCP region configuration from the root module's `regions` output. Contains:
-  - `gcp_region` (string): GCP region name (e.g., "us-central1")
-  - `globals` (map): Global resource references (VPC ID, VPC name, IAM roles)
-  - `template_version` (string): Module version
-  - `zones` (map): Vespa zones available in this GCP region
-
-## Outputs
-
-- `router_name`: Name of the Cloud Router
-- `nat_name`: Name of the Cloud NAT gateway
-- `zones`: Map of Vespa zones in this GCP region (pass to zone modules)
-
-## Notes
-
-- This module only supports dynamic IP allocation (no static NAT IPs)
-- NAT resources are regional in GCP, so you need one module instance per region
-- All Vespa zones within a GCP region share the same NAT gateway
+- `region` (object, required): GCP region configuration from the root module's `regions` output.
