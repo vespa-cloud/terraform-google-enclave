@@ -7,7 +7,7 @@ variable "zone" {
     gcp_region       = string,
     gcp_zone         = string,
     name             = string,
-    resource_ids     = map(any),
+    globals          = map(any),
     template_version = string,
   })
 }
@@ -26,16 +26,4 @@ variable "archive_reader_members" {
   description = "List of members allowed to read archive bucket in the format `type:principal`. See https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam#argument-reference for more details."
   type        = list(string)
   default     = []
-}
-
-variable "nat_static_ip_count" {
-  description =<<-EOT
-    Number of static IPs to reserve for NAT gateways.
-
-    Set to 0 to use ephemeral/dynamic IPs.
-    Important: Changing this value between 0 and a positive number (or vice versa) will trigger the replacement of the NAT gateway, which will cause a brief outage of outbound connectivity from the zone.
-  EOT
-
-  type        = number
-  default     = 0
 }

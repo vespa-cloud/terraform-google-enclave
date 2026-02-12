@@ -1,10 +1,4 @@
-terraform {
-  required_providers {
-    google = {
-      source = "hashicorp/google"
-    }
-  }
-}
+# Archive resources for log storage
 
 data "google_project" "project" {}
 
@@ -37,13 +31,13 @@ resource "google_storage_bucket" "archive" {
 
 resource "google_storage_bucket_iam_member" "archive_write" {
   bucket = google_storage_bucket.archive.name
-  role   = var.zone.resource_ids["archive_role_write"]
+  role   = var.zone.globals.archive_role_write
   member = "serviceAccount:tenant-host@${data.google_project.project.project_id}.iam.gserviceaccount.com"
 }
 
 resource "google_storage_bucket_iam_member" "archive_delete" {
   bucket = google_storage_bucket.archive.name
-  role   = var.zone.resource_ids["archive_role_delete"]
+  role   = var.zone.globals.archive_role_delete
   member = "serviceAccount:tenant-host@${data.google_project.project.project_id}.iam.gserviceaccount.com"
   condition {
     title       = "files that are updated"
@@ -53,9 +47,9 @@ resource "google_storage_bucket_iam_member" "archive_delete" {
 }
 
 resource "google_storage_bucket_iam_member" "archive_reader" {
-  for_each = toset(var.reader_members)
+  for_each = toset(var.archive_reader_members)
   bucket   = google_storage_bucket.archive.name
-  role     = var.zone.resource_ids["archive_role_delete"]
+  role     = var.zone.globals.archive_role_delete
   member   = each.value
   condition {
     title       = "files that are updated"

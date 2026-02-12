@@ -232,8 +232,10 @@ locals {
   template_version     = "1.5.0"
   template_version_gcp = replace(local.template_version, ".", "_")
 
-  resource_ids = {
+  globals = {
     archive_role_write  = google_project_iam_custom_role.archive_object_write.id,
-    archive_role_delete = google_project_iam_custom_role.archive_object_delete.id
+    archive_role_delete = google_project_iam_custom_role.archive_object_delete.id,
+    vpc_id              = google_compute_network.vespa.id,
+    vpc_name            = google_compute_network.vespa.name
   }
 }

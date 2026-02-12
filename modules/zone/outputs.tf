@@ -1,6 +1,3 @@
-output "network_name" {
-  value = google_compute_network.vpc_network.name
-}
 output "hosts_cidr_block" {
   value = local.hosts_cidr_block
 }
@@ -12,5 +9,5 @@ output "hosts_subnet_id" {
 }
 output "archive_bucket" {
   description = "Name of Vespa Cloud Enclave archive bucket"
-  value       = module.archive.bucket
+  value       = google_storage_bucket.archive.name
 }
