@@ -6,7 +6,7 @@ SemVer is required: `MAJOR.MINOR.PATCH` (no `v` prefix in the file).
 
 ## Versioning and tagging policy
 
-- Regular PRs (most changes, including documentation):
+- Regular PRs (most changes):
   - Bump `locals.template_version` in `main.tf`.
   - The new version must be strictly greater than BOTH:
     - The version on `origin/main`, and
@@ -20,18 +20,16 @@ SemVer is required: `MAJOR.MINOR.PATCH` (no `v` prefix in the file).
     - Starting the PR title with `minor` or `[minor` (case-insensitive).
   - CI will fail if `template_version` changes in such PRs.
 
-Important: Documentation changes are NOT considered minor and must bump the version.
-
 Examples of minor/no-tag changes:
 - Changes in `.github/` or `tools/` that do not affect module behavior
-- Comments or typo fixes in code
-- Refactoring that does not alter behavior nor documentation
+- Minor documentation changes (typo fixes, comment updates, small README tweaks)
+- Refactoring that does not alter behavior
 - Tests that do not affect module behavior
 
 Examples that REQUIRE a version bump (regular PRs):
-- Visible documentation changes (README, module docs, examples, etc.)
 - Behavioral changes to Terraform resources, variables, outputs or defaults
-- Any change that users should be aware of when consuming the module
+- New or removed variables, outputs, or resources
+- Any change that users should be aware of when consuming the module, including significant documentation updates
 
 ## What happens on merge
 
@@ -41,7 +39,7 @@ Examples that REQUIRE a version bump (regular PRs):
 ## Practical checklist
 
 Before requesting review:
-- [ ] Is this truly a minor/no-tag PR? If yes, ensure it does NOT include documentation changes, do not bump `template_version`, and mark the PR title/label accordingly.
+- [ ] Is this truly a minor/no-tag PR? If yes, do not bump `template_version`, and mark the PR title/label accordingly.
 - [ ] Otherwise (regular PR), bump `locals.template_version` in `main.tf` to a higher SemVer than BOTH `origin/main` and the latest tag.
 - [ ] Ensure SemVer format `X.Y.Z` (no `v` prefix) in `main.tf`.
 - [ ] Leave `locals.template_version` key name and location unchanged; workflows depend on it.
