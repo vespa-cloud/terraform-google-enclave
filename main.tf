@@ -38,17 +38,6 @@ resource "google_project_iam_custom_role" "vespa_cloud_provisioner_role" {
     # Delete instance
     "compute.instances.delete",
 
-    # Manage DNS resource records
-    # Details in https://cloud.google.com/dns/docs/access-control
-    "dns.changes.get",
-    "dns.changes.list",
-    "dns.changes.create",
-    "dns.resourceRecordSets.get",
-    "dns.resourceRecordSets.list",
-    "dns.resourceRecordSets.delete",
-    "dns.resourceRecordSets.update",
-    "dns.resourceRecordSets.create",
-
     # Provision load balancer
     "compute.addresses.create",
     "compute.addresses.createInternal",
@@ -229,7 +218,7 @@ resource "google_project_iam_custom_role" "archive_object_delete" {
 locals {
   # NOTE: Do not rename or move this variable!
   # Used by github actions to tag releases. Bump for non-trivial changes.
-  template_version     = "1.5.0"
+  template_version     = "1.5.1"
   template_version_gcp = replace(local.template_version, ".", "_")
 
   globals = {
