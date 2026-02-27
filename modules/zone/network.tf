@@ -1,20 +1,8 @@
 # Networking resources for Vespa zone
 
-locals {
-  # x.y.0.0/16    VPC
-  # x.y.0.0/22    tenant hosts
-  # x.y.92.0/22   internal TCP proxies (ServiceConnect), in a separate declaration
-  # x.y.96.0/20   proxy-use-only (ServiceConnect), in a separate declaration
-  # x.y.128.0/17  tenants. Each host gets /96, first for the host and remainder for nodes
-  hosts_cidr_block         = cidrsubnet(var.zone_ipv4_cidr, 6, 0)
-  tenants_cidr_block       = cidrsubnet(var.zone_ipv4_cidr, 1, 1)
-  proxy_cidr_block         = cidrsubnet(var.zone_ipv4_cidr, 4, 6)
-  internal_tcp_proxy_block = cidrsubnet(var.zone_ipv4_cidr, 6, 23)
-}
-
 resource "google_compute_subnetwork" "subnetwork" {
   name          = "${local.zone_name}-subnet-tenant-host"
-  ip_cidr_range = local.hosts_cidr_block
+  ip_cidr_range = var.host_cidr
   region        = var.zone.gcp_region
   network       = var.zone.globals.vpc_id
 
@@ -25,7 +13,11 @@ resource "google_compute_subnetwork" "subnetwork" {
 
   secondary_ip_range {
     range_name    = "tenant"
-    ip_cidr_range = local.tenants_cidr_block
+    ip_cidr_range = var.node_cidr
+  }
+
+  labels = {
+    service_attachment_cidr = replace(replace(var.service_attachment_cidr, ".", "_"), "/", "-")
   }
 
   log_config {
@@ -35,20 +27,9 @@ resource "google_compute_subnetwork" "subnetwork" {
   }
 }
 
-resource "google_compute_subnetwork" "tcp_proxy_only_subnetwork" {
-  # checkov:skip=CKV_GCP_74:TCP proxy subnetwork is used for ServiceConnect
-  # checkov:skip=CKV_GCP_76:TCP proxy subnetwork is used for ServiceConnect
-  name          = "${local.zone_name}-subnet-tcp-proxy-only"
-  ip_cidr_range = local.proxy_cidr_block
-  region        = var.zone.gcp_region
-  network       = var.zone.globals.vpc_id
-  purpose       = "REGIONAL_MANAGED_PROXY"
-  role          = "ACTIVE"
-}
-
 resource "google_compute_subnetwork" "itcp_proxy_fe_subnetwork" {
   name          = "${local.zone_name}-subnet-itcp-proxy-fe"
-  ip_cidr_range = local.internal_tcp_proxy_block
+  ip_cidr_range = var.lb_cidr
   region        = var.zone.gcp_region
   network       = var.zone.globals.vpc_id
 
@@ -67,7 +48,7 @@ resource "google_compute_firewall" "allow_internal_traffic" {
   name          = "${local.zone_name}-firewall-allow-internal-traffic"
   network       = var.zone.globals.vpc_name
   priority      = 2000
-  source_ranges = [var.zone_ipv4_cidr]
+  source_ranges = [var.host_cidr, var.node_cidr, var.lb_cidr, var.service_attachment_cidr, var.zone.proxy_only_cidr]
 
   allow {
     protocol = "all"

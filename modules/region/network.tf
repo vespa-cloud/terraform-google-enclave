@@ -18,6 +18,17 @@ resource "google_compute_router_nat" "nat_dynamic" {
   enable_dynamic_port_allocation = true
 }
 
+resource "google_compute_subnetwork" "proxy_only_subnetwork" {
+  # checkov:skip=CKV_GCP_74:TCP proxy subnetwork is used for ServiceConnect
+  # checkov:skip=CKV_GCP_76:TCP proxy subnetwork is used for ServiceConnect
+  name          = "${var.region.gcp_region}-subnet-tcp-proxy-only"
+  ip_cidr_range = var.proxy_only_cidr
+  region        = var.region.gcp_region
+  network       = var.region.globals.vpc_id
+  purpose       = "REGIONAL_MANAGED_PROXY"
+  role          = "ACTIVE"
+}
+
 resource "google_compute_region_health_check" "tenant_health_check" {
   name   = "${var.region.globals.vpc_name}-${var.region.gcp_region}-healthcheck-tenant"
   region = var.region.gcp_region
