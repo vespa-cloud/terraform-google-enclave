@@ -16,9 +16,10 @@ resource "google_compute_subnetwork" "subnetwork" {
     ip_cidr_range = local.node_cidr
   }
 
-  labels = {
-    service_attachment_cidr = replace(replace(local.service_attachment_cidr, ".", "_"), "/", "-")
-  }
+  # TODO: propagate service_attachment_cidr to the config server so it knows
+  # which IP range to draw PSC NAT /29 subnets from.  google_compute_subnetwork
+  # does not support labels, so the mechanism is TBD (e.g. subnet description,
+  # a tag on the VPC network, or storing it in ZooKeeper during provisioning).
 
   log_config {
     aggregation_interval = "INTERVAL_10_MIN"
