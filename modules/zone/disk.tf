@@ -2,7 +2,7 @@
 
 resource "google_kms_key_ring" "disk" {
   name     = "${local.zone_name}-vespa-cloud-disk-key"
-  location = var.zone.gcp_region
+  location = var.zone.regional.gcp_region
 }
 
 resource "google_kms_crypto_key" "disk" {

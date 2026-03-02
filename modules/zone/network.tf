@@ -3,7 +3,7 @@
 resource "google_compute_subnetwork" "subnetwork" {
   name          = "${local.zone_name}-subnet-tenant-host"
   ip_cidr_range = var.host_cidr
-  region        = var.zone.gcp_region
+  region        = var.zone.regional.gcp_region
   network       = var.zone.globals.vpc_id
 
   stack_type                 = "IPV4_IPV6"
@@ -26,7 +26,7 @@ resource "google_compute_subnetwork" "subnetwork" {
 resource "google_compute_subnetwork" "itcp_proxy_fe_subnetwork" {
   name          = "${local.zone_name}-subnet-itcp-proxy-fe"
   ip_cidr_range = var.lb_cidr
-  region        = var.zone.gcp_region
+  region        = var.zone.regional.gcp_region
   network       = var.zone.globals.vpc_id
 
   private_ip_google_access   = true
@@ -44,7 +44,7 @@ resource "google_compute_firewall" "allow_internal_traffic" {
   name          = "${local.zone_name}-firewall-allow-internal-traffic"
   network       = var.zone.globals.vpc_name
   priority      = 2000
-  source_ranges = [var.host_cidr, var.node_cidr, var.lb_cidr, var.service_attachment_cidr, var.zone.proxy_only_cidr]
+  source_ranges = [var.host_cidr, var.node_cidr, var.lb_cidr, var.service_attachment_cidr, var.zone.regional.proxy_only_cidr]
 
   allow {
     protocol = "all"

@@ -3,12 +3,11 @@ variable "zone" {
   type = object({
     environment      = string,
     region           = string,
-    gcp_region       = string,
     gcp_zone         = string,
     name             = string,
     globals          = map(any),
     template_version = string,
-    proxy_only_cidr  = string,
+    regional         = map(any),
   })
 }
 
