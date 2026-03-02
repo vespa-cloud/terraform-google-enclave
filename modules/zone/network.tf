@@ -2,7 +2,7 @@
 
 resource "google_compute_subnetwork" "subnetwork" {
   name          = "${local.zone_name}-subnet-tenant-host"
-  ip_cidr_range = local.host_cidr
+  ip_cidr_range = var.host_cidr
   region        = var.zone.gcp_region
   network       = var.zone.globals.vpc_id
 
@@ -13,7 +13,7 @@ resource "google_compute_subnetwork" "subnetwork" {
 
   secondary_ip_range {
     range_name    = "tenant"
-    ip_cidr_range = local.node_cidr
+    ip_cidr_range = var.node_cidr
   }
 
   # TODO: propagate service_attachment_cidr to the config server so it knows
@@ -30,7 +30,7 @@ resource "google_compute_subnetwork" "subnetwork" {
 
 resource "google_compute_subnetwork" "itcp_proxy_fe_subnetwork" {
   name          = "${local.zone_name}-subnet-itcp-proxy-fe"
-  ip_cidr_range = local.lb_cidr
+  ip_cidr_range = var.lb_cidr
   region        = var.zone.gcp_region
   network       = var.zone.globals.vpc_id
 
@@ -49,7 +49,7 @@ resource "google_compute_firewall" "allow_internal_traffic" {
   name          = "${local.zone_name}-firewall-allow-internal-traffic"
   network       = var.zone.globals.vpc_name
   priority      = 2000
-  source_ranges = [local.host_cidr, local.node_cidr, local.lb_cidr, local.service_attachment_cidr, var.zone.proxy_only_cidr]
+  source_ranges = [var.host_cidr, var.node_cidr, var.lb_cidr, var.service_attachment_cidr, var.zone.proxy_only_cidr]
 
   allow {
     protocol = "all"

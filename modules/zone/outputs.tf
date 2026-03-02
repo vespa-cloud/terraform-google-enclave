@@ -1,5 +1,5 @@
 output "hosts_cidr_block" {
-  value = local.host_cidr
+  value = var.host_cidr
 }
 output "hosts_ipv6_cidr_block" {
   value = google_compute_subnetwork.subnetwork.ipv6_cidr_range

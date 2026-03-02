@@ -1,24 +1,5 @@
 # Regional networking resources
 
-locals {
-  # Default proxy-only /26 per GCP region, one per VPC+region as required by GCP.
-  # Each default is placed at the very start of its per-region /16 block so that
-  # the remainder (.8.0 onwards) is free for per-zone /21 supernets.
-  # All ranges are within 10.0.0.0/9 (avoiding the 10.128.0.0/9 block GCP
-  # advises against for subnet primary/secondary ranges).
-  _default_proxy_only_cidrs = {
-    "us-central1"  = "10.0.0.0/26"
-    "us-east4"     = "10.1.0.0/26"
-    "europe-west3" = "10.2.0.0/26"
-  }
-
-  proxy_only_cidr = (
-    var.proxy_only_cidr != null
-    ? var.proxy_only_cidr
-    : local._default_proxy_only_cidrs[var.region.gcp_region]
-  )
-}
-
 resource "google_compute_router" "nat" {
   name    = "${var.region.globals.vpc_name}-${var.region.gcp_region}-router-nat-gw"
   region  = var.region.gcp_region
@@ -41,7 +22,7 @@ resource "google_compute_subnetwork" "proxy_only_subnetwork" {
   # checkov:skip=CKV_GCP_74:TCP proxy subnetwork is used for ServiceConnect
   # checkov:skip=CKV_GCP_76:TCP proxy subnetwork is used for ServiceConnect
   name          = "${var.region.gcp_region}-subnet-tcp-proxy-only"
-  ip_cidr_range = local.proxy_only_cidr
+  ip_cidr_range = var.proxy_only_cidr
   region        = var.region.gcp_region
   network       = var.region.globals.vpc_id
   purpose       = "REGIONAL_MANAGED_PROXY"
