@@ -14,7 +14,7 @@ output "zones" {
     for env, zone_map in var.region.zones :
     env => {
       for zone_key, zone_data in zone_map :
-      zone_key => merge(zone_data, { proxy_only_cidr = var.proxy_only_cidr })
+      zone_key => merge(zone_data, { proxy_only_cidr = local.proxy_only_cidr })
     }
   }
 }
