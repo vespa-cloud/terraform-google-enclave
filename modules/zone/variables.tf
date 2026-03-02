@@ -36,6 +36,10 @@ variable "node_cidr" {
   }
 }
 
+# TODO: propagate service_attachment_cidr to the config server so it knows
+# which IP range to draw PSC NAT /29 subnets from.  google_compute_subnetwork
+# does not support labels, so the mechanism is TBD (e.g. subnet description,
+# a tag on the VPC network, or storing it in ZooKeeper during provisioning).
 variable "service_attachment_cidr" {
   description = "Private IPv4 CIDR for NAT subnets on Private Service Connect service attachments"
   type        = string
