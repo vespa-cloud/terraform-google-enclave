@@ -44,7 +44,7 @@ resource "google_compute_firewall" "allow_internal_traffic" {
   name          = "${local.zone_name}-firewall-allow-internal-traffic"
   network       = var.zone.globals.vpc_name
   priority      = 2000
-  source_ranges = [var.host_cidr, var.node_cidr, var.lb_cidr, var.service_attachment_cidr, var.zone.regional.proxy_only_cidr]
+  source_ranges = [var.host_cidr, var.node_cidr, var.lb_cidr, var.private_service_connect_cidr, var.zone.regional.proxy_only_cidr]
 
   allow {
     protocol = "all"
