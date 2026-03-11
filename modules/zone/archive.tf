@@ -24,8 +24,9 @@ resource "google_storage_bucket" "archive" {
   }
 
   labels = {
-    managedby              = "vespa-cloud"
-    vespa_template_version = var.zone.template_version
+    managedby                    = "vespa-cloud"
+    vespa_template_version       = var.zone.template_version
+    private_service_connect_cidr = replace(replace(var.private_service_connect_cidr, ".", "_"), "/", "-")
   }
 }
 
