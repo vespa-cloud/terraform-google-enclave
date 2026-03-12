@@ -39,6 +39,21 @@ resource "google_compute_subnetwork" "itcp_proxy_fe_subnetwork" {
   }
 }
 
+resource "google_compute_region_health_check" "tenant_health_check" {
+  name   = "${local.zone_name}-healthcheck-tenant"
+  region = var.zone.regional.gcp_region
+
+  check_interval_sec  = 10
+  healthy_threshold   = 2
+  unhealthy_threshold = 2
+
+  https_health_check {
+    port         = 4443
+    request_path = "/status.html"
+    proxy_header = "PROXY_V1"
+  }
+}
+
 resource "google_compute_firewall" "allow_internal_traffic" {
   #checkov:skip=CKV2_GCP_12:Communication internally on the private network is allowed
   name          = "${local.zone_name}-firewall-allow-internal-traffic"

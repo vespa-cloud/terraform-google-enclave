@@ -29,17 +29,3 @@ resource "google_compute_subnetwork" "proxy_only_subnetwork" {
   role          = "ACTIVE"
 }
 
-resource "google_compute_region_health_check" "tenant_health_check" {
-  name   = "${var.region.globals.vpc_name}-${var.region.gcp_region}-healthcheck-tenant"
-  region = var.region.gcp_region
-
-  check_interval_sec  = 10
-  healthy_threshold   = 2
-  unhealthy_threshold = 2
-
-  https_health_check {
-    port         = 4443
-    request_path = "/status.html"
-    proxy_header = "PROXY_V1"
-  }
-}
