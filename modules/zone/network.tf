@@ -23,8 +23,8 @@ resource "google_compute_subnetwork" "subnetwork" {
   }
 }
 
-resource "google_compute_subnetwork" "itcp_proxy_fe_subnetwork" {
   name          = "${local.zone_name}-subnet-itcp-proxy-fe"
+resource "google_compute_subnetwork" "service_connect_forwarding_rule" {
   ip_cidr_range = var.lb_cidr
   region        = var.zone.regional.gcp_region
   network       = var.zone.globals.vpc_id
