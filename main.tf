@@ -226,5 +226,6 @@ locals {
     archive_role_delete = google_project_iam_custom_role.archive_object_delete.id,
     vpc_id              = google_compute_network.vespa.id,
     vpc_name            = google_compute_network.vespa.name
+    vpc_self_link       = google_compute_network.vespa.self_link
   }
 }

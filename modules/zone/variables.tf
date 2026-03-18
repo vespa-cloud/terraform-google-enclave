@@ -1,13 +1,22 @@
 variable "zone" {
   description = "Vespa Cloud zone to bootstrap"
   type = object({
-    environment      = string,
-    region           = string,
-    gcp_zone         = string,
-    name             = string,
-    globals          = map(any),
+    environment = string,
+    region      = string,
+    gcp_zone    = string,
+    name        = string,
+    globals = object({
+      archive_role_write  = string
+      archive_role_delete = string
+      vpc_id              = string
+      vpc_name            = string
+      vpc_self_link       = string
+    }),
     template_version = string,
-    regional         = map(any),
+    regional = object({
+      gcp_region      = string
+      proxy_only_cidr = string
+    }),
   })
 }
 
