@@ -1,9 +1,7 @@
 # Networking resources for Vespa zone
 
-resource "google_compute_subnetwork" "subnetwork" {
-  name          = "${local.zone_name}-subnet-tenant-host"
 resource "google_compute_subnetwork" "subnet_tenant" {
-  name          = "${local.zone_name}-subnet-tenant"
+  name          = "${local.zone_name}-subnet-tenant-host"
   ip_cidr_range = var.host_cidr
   region        = var.zone.regional.gcp_region
   network       = var.zone.globals.vpc_id
@@ -25,8 +23,8 @@ resource "google_compute_subnetwork" "subnet_tenant" {
   }
 }
 
-  name          = "${local.zone_name}-subnet-itcp-proxy-fe"
 resource "google_compute_subnetwork" "service_connect_forwarding_rule" {
+  name          = "${local.zone_name}-subnet-scfw-rule"
   ip_cidr_range = var.lb_cidr
   region        = var.zone.regional.gcp_region
   network       = var.zone.globals.vpc_id
@@ -58,8 +56,6 @@ resource "google_compute_region_health_check" "tenant_health_check" {
 
 resource "google_compute_firewall" "allow_internal_ipv4" {
   #checkov:skip=CKV2_GCP_12:Communication internally on the private network is allowed
-  name          = "${local.zone_name}-firewall-allow-internal-traffic"
-  network       = var.zone.globals.vpc_name
   name          = "${local.zone_name}-firewall-allow-internal-ipv4"
   network       = var.zone.globals.vpc_self_link
   priority      = 2000
@@ -72,8 +68,6 @@ resource "google_compute_firewall" "allow_internal_ipv4" {
 
 resource "google_compute_firewall" "allow_internal_ipv6" {
   #checkov:skip=CKV2_GCP_12:Communication internally on the private network is allowed
-  name          = "${local.zone_name}-firewall-allow-internal-ipv6-traffic"
-  network       = var.zone.globals.vpc_name
   name          = "${local.zone_name}-firewall-allow-internal-ipv6"
   network       = var.zone.globals.vpc_self_link
   priority      = 2100
