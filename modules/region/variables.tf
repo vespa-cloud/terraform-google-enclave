@@ -1,8 +1,15 @@
 variable "region" {
   description = "GCP region configuration with global resource references and zones in this region"
   type = object({
-    gcp_region       = string,
-    globals          = map(any),
+    gcp_region = string,
+    globals = object({
+      archive_role_write  = string
+      archive_role_delete = string
+      vpc_id              = string
+      vpc_name            = string
+      vpc_self_link       = string
+    }),
+
     template_version = string,
     zones            = map(any),
   })

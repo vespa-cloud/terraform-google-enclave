@@ -1,13 +1,17 @@
 locals {
   zones_by_env = {
     for zone in var.all_zones :
-    zone.environment => merge({
-      name             = "${zone.environment}.${zone.gcp_zone}",
-      region           = "gcp-${zone.gcp_zone}",
-      globals          = local.globals,
-      template_version = local.template_version_gcp,
-    }, zone)...
+    zone.environment => {
+      name             = "${zone.environment}.${zone.gcp_zone}"
+      region           = "gcp-${zone.gcp_zone}"
+      environment      = zone.environment
+      gcp_zone         = zone.gcp_zone
+      gcp_region       = zone.gcp_region
+      globals          = local.globals
+      template_version = local.template_version_gcp
+    }...
   }
+
 
   # Extract unique GCP regions from all zones
   unique_regions = toset([for zone in var.all_zones : zone.gcp_region])
@@ -32,12 +36,15 @@ locals {
         for env in distinct([for z in local.zones_by_region[region] : z.environment]) :
         env => {
           for zone_data in local.zones_by_region[region] :
-          replace("gcp-${zone_data.gcp_zone}", "-", "_") => merge({
-            name             = "${zone_data.environment}.${zone_data.gcp_zone}",
-            region           = "gcp-${zone_data.gcp_zone}",
-            globals          = local.globals,
-            template_version = local.template_version_gcp,
-          }, zone_data)
+          replace("gcp-${zone_data.gcp_zone}", "-", "_") => {
+            name             = "${zone_data.environment}.${zone_data.gcp_zone}"
+            region           = "gcp-${zone_data.gcp_zone}"
+            environment      = zone_data.environment
+            gcp_zone         = zone_data.gcp_zone
+            gcp_region       = zone_data.gcp_region
+            globals          = local.globals
+            template_version = local.template_version_gcp
+          }
           if zone_data.environment == env
         }
       }
