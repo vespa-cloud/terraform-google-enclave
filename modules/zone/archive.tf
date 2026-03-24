@@ -1,10 +1,4 @@
-terraform {
-  required_providers {
-    google = {
-      source = "hashicorp/google"
-    }
-  }
-}
+# Archive resources for log storage
 
 data "google_project" "project" {}
 
@@ -16,7 +10,7 @@ resource "random_string" "archive" {
 
 resource "google_storage_bucket" "archive" {
   name                        = "vespa-archive-${var.zone.environment}-${var.zone.gcp_zone}-${data.google_project.project.number}-${random_string.archive.id}"
-  location                    = var.zone.gcp_region
+  location                    = var.zone.regional.gcp_region
   force_destroy               = false
   uniform_bucket_level_access = true
   public_access_prevention    = "enforced"
@@ -30,20 +24,21 @@ resource "google_storage_bucket" "archive" {
   }
 
   labels = {
-    managedby              = "vespa-cloud"
-    vespa_template_version = var.zone.template_version
+    managedby                    = "vespa-cloud"
+    vespa_template_version       = var.zone.template_version
+    private_service_connect_cidr = replace(replace(var.private_service_connect_cidr, ".", "_"), "/", "-")
   }
 }
 
 resource "google_storage_bucket_iam_member" "archive_write" {
   bucket = google_storage_bucket.archive.name
-  role   = var.zone.resource_ids["archive_role_write"]
+  role   = var.zone.globals.archive_role_write
   member = "serviceAccount:tenant-host@${data.google_project.project.project_id}.iam.gserviceaccount.com"
 }
 
 resource "google_storage_bucket_iam_member" "archive_delete" {
   bucket = google_storage_bucket.archive.name
-  role   = var.zone.resource_ids["archive_role_delete"]
+  role   = var.zone.globals.archive_role_delete
   member = "serviceAccount:tenant-host@${data.google_project.project.project_id}.iam.gserviceaccount.com"
   condition {
     title       = "files that are updated"
@@ -53,9 +48,9 @@ resource "google_storage_bucket_iam_member" "archive_delete" {
 }
 
 resource "google_storage_bucket_iam_member" "archive_reader" {
-  for_each = toset(var.reader_members)
+  for_each = toset(var.archive_reader_members)
   bucket   = google_storage_bucket.archive.name
-  role     = var.zone.resource_ids["archive_role_delete"]
+  role     = var.zone.globals.archive_role_delete
   member   = each.value
   condition {
     title       = "files that are updated"

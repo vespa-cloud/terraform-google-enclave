@@ -1,12 +1,54 @@
 locals {
   zones_by_env = {
     for zone in var.all_zones :
-    zone.environment => merge({
-      name             = "${zone.environment}.${zone.gcp_zone}",
-      region           = "gcp-${zone.gcp_zone}",
-      resource_ids     = local.resource_ids,
-      template_version = local.template_version_gcp,
-    }, zone)...
+    zone.environment => {
+      name             = "${zone.environment}.${zone.gcp_zone}"
+      region           = "gcp-${zone.gcp_zone}"
+      environment      = zone.environment
+      gcp_zone         = zone.gcp_zone
+      gcp_region       = zone.gcp_region
+      globals          = local.globals
+      template_version = local.template_version_gcp
+    }...
+  }
+
+
+  # Extract unique GCP regions from all zones
+  unique_regions = toset([for zone in var.all_zones : zone.gcp_region])
+
+  # Group zones by GCP region
+  zones_by_region = {
+    for region in local.unique_regions :
+    region => [
+      for zone in var.all_zones :
+      zone if zone.gcp_region == region
+    ]
+  }
+
+  # Create region objects with gcp_region, globals, and zones in that region
+  regions_map = {
+    for region in local.unique_regions :
+    replace(region, "-", "_") => {
+      gcp_region       = region
+      globals          = local.globals
+      template_version = local.template_version_gcp
+      zones = {
+        for env in distinct([for z in local.zones_by_region[region] : z.environment]) :
+        env => {
+          for zone_data in local.zones_by_region[region] :
+          replace("gcp-${zone_data.gcp_zone}", "-", "_") => {
+            name             = "${zone_data.environment}.${zone_data.gcp_zone}"
+            region           = "gcp-${zone_data.gcp_zone}"
+            environment      = zone_data.environment
+            gcp_zone         = zone_data.gcp_zone
+            gcp_region       = zone_data.gcp_region
+            globals          = local.globals
+            template_version = local.template_version_gcp
+          }
+          if zone_data.environment == env
+        }
+      }
+    }
   }
 }
 
@@ -16,13 +58,11 @@ output "zones" {
     for environment, zones in local.zones_by_env :
     environment => { for zone in zones : replace(zone.region, "-", "_") => zone }
   }
+}
 
-  # Zone creation depends on these resources
-  depends_on = [
-    google_service_account.tenant_host,
-    google_project_iam_custom_role.archive_object_write,
-    google_project_iam_custom_role.archive_object_delete
-  ]
+output "regions" {
+  description = "Map of GCP regions with global resource references. Reference a region with hyphens replaced by underscores (e.g. `us_central1`, `europe_west3`)."
+  value       = local.regions_map
 }
 
 output "vespa_cloud_project" {
