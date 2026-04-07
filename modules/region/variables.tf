@@ -5,6 +5,7 @@ variable "region" {
     globals = object({
       archive_role_write  = string
       archive_role_delete = string
+      backup_role_expiry  = string
       vpc_id              = string
       vpc_name            = string
       vpc_self_link       = string
