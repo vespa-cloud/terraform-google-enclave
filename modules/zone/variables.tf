@@ -22,6 +22,12 @@ variable "zone_ipv4_cidr" {
   }
 }
 
+variable "vespa_cloud_project" {
+  description = "The project the Vespa Cloud provisioner resides in"
+  type        = string
+  default     = "vespa-external"
+}
+
 variable "archive_reader_members" {
   description = "List of members allowed to read archive bucket in the format `type:principal`. See https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam#argument-reference for more details."
   type        = list(string)
