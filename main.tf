@@ -228,7 +228,7 @@ resource "google_project_iam_custom_role" "backup_object_expiry" {
 locals {
   # NOTE: Do not rename or move this variable!
   # Used by github actions to tag releases. Bump for non-trivial changes.
-  template_version     = "2.1.1"
+  template_version     = "2.1.2"
   template_version_gcp = replace(local.template_version, ".", "_")
 
   globals = {
