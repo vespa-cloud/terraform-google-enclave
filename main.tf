@@ -215,14 +215,25 @@ resource "google_project_iam_custom_role" "archive_object_delete" {
   ]
 }
 
+resource "google_project_iam_custom_role" "backup_object_expiry" {
+  role_id     = "backup_object_expiry"
+  title       = "Backup object expiry role"
+  description = "Allow listing and deleting from the backup bucket"
+  permissions = [
+    "storage.objects.delete",
+    "storage.objects.list",
+  ]
+}
+
 locals {
   # NOTE: Do not rename or move this variable!
   # Used by github actions to tag releases. Bump for non-trivial changes.
-  template_version     = "1.5.1"
+  template_version     = "1.6.0"
   template_version_gcp = replace(local.template_version, ".", "_")
 
   resource_ids = {
     archive_role_write  = google_project_iam_custom_role.archive_object_write.id,
-    archive_role_delete = google_project_iam_custom_role.archive_object_delete.id
+    archive_role_delete = google_project_iam_custom_role.archive_object_delete.id,
+    backup_role_expiry  = google_project_iam_custom_role.backup_object_expiry.id
   }
 }

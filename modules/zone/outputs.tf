@@ -14,3 +14,7 @@ output "archive_bucket" {
   description = "Name of Vespa Cloud Enclave archive bucket"
   value       = module.archive.bucket
 }
+output "backup_bucket" {
+  description = "Name of Vespa Cloud Enclave backup bucket"
+  value       = google_storage_bucket.backup.name
+}
