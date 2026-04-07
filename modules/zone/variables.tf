@@ -8,6 +8,7 @@ variable "zone" {
     globals = object({
       archive_role_write  = string
       archive_role_delete = string
+      backup_role_expiry  = string
       vpc_id              = string
       vpc_name            = string
       vpc_self_link       = string
@@ -18,6 +19,12 @@ variable "zone" {
       proxy_only_cidr = string
     }),
   })
+}
+
+variable "vespa_cloud_project" {
+  description = "The project the Vespa Cloud provisioner resides in"
+  type        = string
+  default     = "vespa-external"
 }
 
 variable "archive_reader_members" {
