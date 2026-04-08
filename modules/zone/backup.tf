@@ -41,7 +41,7 @@ resource "google_storage_bucket_iam_member" "backup_expirer" {
 }
 
 resource "google_kms_key_ring" "backup" {
-  name     = "${var.zone.environment}-${var.zone.gcp_zone}-vespa-cloud-backup-key"
+  name     = "${local.zone_name}-vespa-cloud-backup-key"
   location = var.zone.regional.gcp_region
 }
 
