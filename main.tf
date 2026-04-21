@@ -20,6 +20,7 @@ resource "google_project_iam_custom_role" "vespa_cloud_provisioner_role" {
 
     # Provision instance
     "compute.disks.create",
+    "compute.disks.get",
     "compute.disks.setLabels",
     "compute.forwardingRules.setLabels",
     "compute.instances.attachDisk",
@@ -228,7 +229,7 @@ resource "google_project_iam_custom_role" "backup_object_expiry" {
 locals {
   # NOTE: Do not rename or move this variable!
   # Used by github actions to tag releases. Bump for non-trivial changes.
-  template_version     = "2.1.2"
+  template_version     = "2.1.3"
   template_version_gcp = replace(local.template_version, ".", "_")
 
   globals = {
