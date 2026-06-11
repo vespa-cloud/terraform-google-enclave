@@ -23,6 +23,7 @@ variable "all_zones" {
     gcp_zone    = string
   }))
   default = [
+    { environment = "dev", gcp_region = "us-central1", gcp_zone = "us-central1-a" },
     { environment = "dev", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
     { environment = "test", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
     { environment = "staging", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
