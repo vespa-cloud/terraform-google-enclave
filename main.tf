@@ -134,7 +134,10 @@ resource "google_service_account" "tenant_host" {
 # https://cloud.google.com/compute/docs/disks/customer-managed-encryption#before_you_begin
 data "google_project" "project" {}
 resource "google_project_iam_member" "compute_project" {
-  project = data.google_project.project.project_id
+  # The project id is derived from the computed `id` attribute instead of
+  # `project_id` because only computed attributes can be mocked in the
+  # smoke test; the values are identical.
+  project = trimprefix(data.google_project.project.id, "projects/")
   role    = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
   member  = "serviceAccount:service-${data.google_project.project.number}@compute-system.iam.gserviceaccount.com"
 
