@@ -1,10 +1,9 @@
 # Backup storage for Vespa Cloud snapshots
 
-data "google_project" "backup" {}
 data "google_storage_project_service_account" "gcs_account" {}
 
 resource "google_storage_bucket" "backup" {
-  name                        = "backup-${data.google_project.backup.project_id}-${var.zone.environment}-gcp-${var.zone.gcp_zone}"
+  name                        = "backup-${local.project_id}-${var.zone.environment}-gcp-${var.zone.gcp_zone}"
   location                    = var.zone.regional.gcp_region
   force_destroy               = false
   public_access_prevention    = "enforced"
@@ -31,7 +30,7 @@ resource "google_storage_bucket_iam_member" "backup_creator" {
   ])
   bucket = google_storage_bucket.backup.name
   role   = each.value
-  member = "serviceAccount:tenant-host@${data.google_project.backup.project_id}.iam.gserviceaccount.com"
+  member = "serviceAccount:tenant-host@${local.project_id}.iam.gserviceaccount.com"
 }
 
 resource "google_storage_bucket_iam_member" "backup_expirer" {

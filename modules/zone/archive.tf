@@ -33,13 +33,13 @@ resource "google_storage_bucket" "archive" {
 resource "google_storage_bucket_iam_member" "archive_write" {
   bucket = google_storage_bucket.archive.name
   role   = var.zone.globals.archive_role_write
-  member = "serviceAccount:tenant-host@${data.google_project.project.project_id}.iam.gserviceaccount.com"
+  member = "serviceAccount:tenant-host@${local.project_id}.iam.gserviceaccount.com"
 }
 
 resource "google_storage_bucket_iam_member" "archive_delete" {
   bucket = google_storage_bucket.archive.name
   role   = var.zone.globals.archive_role_delete
-  member = "serviceAccount:tenant-host@${data.google_project.project.project_id}.iam.gserviceaccount.com"
+  member = "serviceAccount:tenant-host@${local.project_id}.iam.gserviceaccount.com"
   condition {
     title       = "files that are updated"
     description = "Limit delete to files that are updated"
