@@ -46,6 +46,8 @@ resource "google_project_iam_custom_role" "vespa_cloud_provisioner_role" {
     "compute.addresses.use",
     "compute.addresses.useInternal",
     "compute.backendServices.create",
+    "compute.backendServices.get",
+    "compute.backendServices.update",
     "compute.backendServices.use",
     "compute.forwardingRules.create",
     "compute.forwardingRules.get",
@@ -65,6 +67,8 @@ resource "google_project_iam_custom_role" "vespa_cloud_provisioner_role" {
     "compute.networkEndpointGroups.use",
     "compute.networks.updatePolicy",
     "compute.regionBackendServices.create",
+    "compute.regionBackendServices.get",
+    "compute.regionBackendServices.update",
     "compute.regionBackendServices.use",
     "compute.regionHealthChecks.useReadOnly",
     "compute.regionTargetTcpProxies.create",
@@ -232,7 +236,7 @@ resource "google_project_iam_custom_role" "backup_object_expiry" {
 locals {
   # NOTE: Do not rename or move this variable!
   # Used by github actions to tag releases. Bump for non-trivial changes.
-  template_version     = "2.1.4"
+  template_version     = "2.1.5"
   template_version_gcp = replace(local.template_version, ".", "_")
 
   globals = {
