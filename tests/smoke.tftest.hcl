@@ -49,8 +49,8 @@ run "root_module" {
   }
 
   assert {
-    condition     = output.zones.prod.gcp_us_central1_f.gcp_zone == "us-central1-f"
-    error_message = "prod.gcp-us-central1-f should map to GCP zone us-central1-f"
+    condition     = output.regions.us_central1.zones.prod.gcp_us_central1_f.gcp_zone == "us-central1-f"
+    error_message = "regions.us_central1.zones.prod.gcp_us_central1_f should map to GCP zone us-central1-f"
   }
 
   assert {
@@ -71,5 +71,10 @@ run "full_composition" {
   assert {
     condition     = output.router_name == "vespa-us-central1-router-nat-gw"
     error_message = "router name not derived from VPC name and region as expected"
+  }
+
+  assert {
+    condition     = output.zones.prod.gcp_us_central1_f.regional.proxy_only_cidr == "10.0.0.0/26"
+    error_message = "region module zones should carry the regional proxy_only_cidr"
   }
 }
