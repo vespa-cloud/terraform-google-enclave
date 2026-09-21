@@ -1,18 +1,4 @@
 locals {
-  zones_by_env = {
-    for zone in var.all_zones :
-    zone.environment => {
-      name             = "${zone.environment}.${zone.gcp_zone}"
-      region           = "gcp-${zone.gcp_zone}"
-      environment      = zone.environment
-      gcp_zone         = zone.gcp_zone
-      gcp_region       = zone.gcp_region
-      globals          = local.globals
-      template_version = local.template_version_gcp
-    }...
-  }
-
-
   # Extract unique GCP regions from all zones
   unique_regions = toset([for zone in var.all_zones : zone.gcp_region])
 
@@ -49,14 +35,6 @@ locals {
         }
       }
     }
-  }
-}
-
-output "zones" {
-  description = "Available zones are listed at https://cloud.vespa.ai/en/reference/zones.html . You reference a zone with `[environment].[region with - replaced by _]` (e.g `prod.gcp-us-central-1f`)."
-  value = {
-    for environment, zones in local.zones_by_env :
-    environment => { for zone in zones : replace(zone.region, "-", "_") => zone }
   }
 }
 

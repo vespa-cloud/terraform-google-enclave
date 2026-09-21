@@ -1,8 +1,9 @@
 # Vespa Cloud Enclave on GCP
 
-This Terraform module bootstraps a Google Cloud Platform project with the identities, roles and
-permissions required to run Vespa Cloud Enclaves on GCP. It also exposes the set of supported
-Vespa Cloud zones so you can create one or more Enclave networks using the provided zone submodule.
+This Terraform module bootstraps a Google Cloud Platform project with the identities, roles,
+permissions and global network required to run Vespa Cloud Enclaves on GCP. It also exposes the set
+of supported GCP regions and Vespa Cloud zones so you can create regional and zonal resources using
+the provided `modules/region` and `modules/zone` submodules.
 
 See Vespa Cloud documentation: https://cloud.vespa.ai/
 
@@ -19,17 +20,29 @@ This module is published on both the Terraform and OpenTofu registries.
 
 
 ## What this module sets up
+
+The root module creates the project-wide resources:
 - Service accounts for tenant hosts and Vespa Cloud operator SSH access
-- Custom IAM roles for the Vespa Cloud provisioner to manage VMs, disks, load balancers, DNS, and networking
-- Custom IAM roles for archive storage (write, delete) and ServiceConnect
+- Custom IAM roles for the Vespa Cloud provisioner to manage VMs, disks, load balancers, and networking
+- Custom IAM roles for archive storage (write, delete), backup storage (expiry) and ServiceConnect
 - IAM bindings granting the Vespa Cloud provisioner and service connector the necessary permissions
 - A read-only IAM role letting Vespa Cloud list instances in the project, so instances unknown to its node repository are detected
 - KMS encryption permissions for the Compute Engine service agent
+- A single global VPC network (`vespa`) shared by all regions and zones, with firewall rules allowing
+  health checks and, optionally, SSH via IAP
 - A global health check for tenant load balancers
 - Required GCP APIs enabled (Cloud KMS, Cloud Resource Manager, Compute Engine)
 
-Networking (VPC, subnets, firewall rules, KMS keys, Cloud Storage for archives) is created per-zone via
-the `modules/zone` submodule after the root module has been applied.
+The `modules/region` submodule creates the resources shared by all zones in one GCP region:
+- A Cloud Router and Cloud NAT gateway with dynamic IP allocation
+- A proxy-only subnet for the regional Envoy-based load balancers used by private endpoints
+
+The `modules/zone` submodule creates the resources for one Vespa Cloud zone:
+- Subnets for tenant hosts (with a secondary range for nodes) and for private endpoint forwarding rules
+- Firewall rules allowing internal IPv4 and IPv6 traffic within the zone
+- A regional health check for tenant load balancers
+- KMS key rings and keys for disk and backup encryption
+- Cloud Storage buckets for archives and backups
 
 ## Requirements
 - Terraform >= 1.3 or OpenTofu >= 1.6
@@ -111,7 +124,6 @@ See complete working examples in `examples/`.
 - `lb_cidr` (string, required): CIDR for load balancer forwarding rules on private endpoints. Recommended: `/25` (128 IPs).
 - `private_service_connect_cidr` (string, required): CIDR for Private Service Connect NAT subnets. Recommended: `/25` (128 IPs), packed with `lb_cidr` in the same `/24`.
 - `archive_reader_members` (list, optional): Members allowed to read the Cloud Storage archive bucket.
-- `nat_static_ip_count` (number, optional, default `0`): Number of static IPs for NAT. `0` uses ephemeral IPs.
 
 ### CIDR planning
 
@@ -128,8 +140,23 @@ Recommended per-region layout (3 zones):
 ```
 
 ## Outputs
-- `zones` (map): Map of available Vespa Cloud zones grouped by environment. Keys are referenced as
-  `[environment].[region with - replaced by _]`, for example: `prod.gcp_us_central1_f` or `dev.gcp_us_central1_f`.
+
+### Root module
+- `regions` (map): Map of GCP regions that host Vespa Cloud zones, keyed by the GCP region name with
+  `-` replaced by `_`, for example `us_central1` or `europe_west3`. Pass a region object to the
+  `region` input of `modules/region`. Each region object contains the following public members:
+  - `gcp_region`: GCP region (e.g. `us-central1`)
+  - `template_version`: Module template version
+  - `zones`: The Vespa Cloud zones in this region, grouped by environment. Use the `zones` output
+    of `modules/region` rather than this member when configuring zone submodules.
+
+- `vespa_cloud_project` (string): The Vespa Cloud GCP project used to manage enclave accounts.
+
+- `tenant_host_service_account` (object): The tenant host service account details.
+
+### modules/region
+- `zones` (map): Map of available Vespa Cloud zones in this region, grouped by environment. Keys are referenced as
+  `[Vespa Cloud zone with - replaced by _]`, for example `prod.gcp_us_central1_f` or `dev.gcp_us_central1_f`.
   Each zone object contains the following public members:
   - `name`: Full Vespa Cloud zone name (e.g. `prod.us-central1-f`)
   - `region`: Vespa region id (e.g. `gcp-us-central1-f`)
@@ -137,23 +164,43 @@ Recommended per-region layout (3 zones):
   - `gcp_zone`: GCP zone (e.g. `us-central1-f`)
   - `template_version`: Module template version
 
-- `vespa_cloud_project` (string): The Vespa Cloud GCP project used to manage enclave accounts.
-
-- `tenant_host_service_account` (object): The tenant host service account details.
+### modules/zone
+- `hosts_cidr_block` (string): The IPv4 CIDR of the tenant host subnet (same as `host_cidr`).
+- `hosts_ipv6_cidr_block` (string): The IPv6 CIDR assigned to the tenant host subnet.
+- `hosts_subnet_id` (string): ID of the tenant host subnet.
+- `archive_bucket` (string): Name of the Cloud Storage archive bucket.
+- `backup_bucket` (string): Name of the Cloud Storage backup bucket.
 
 ## Providers
 - hashicorp/google
+- hashicorp/random (`modules/zone` only)
 
 ## Resources created
+
+### Root module
 - `google_project_service`: Enables required APIs (Cloud KMS, Cloud Resource Manager, Compute Engine)
-- `google_project_iam_custom_role`: Custom roles for provisioner, inventory (read-only), SSH, archive write/delete, service connector
+- `google_project_iam_custom_role`: Custom roles for provisioner, inventory (read-only), SSH, archive write/delete, backup expiry, service connector
 - `google_project_iam_member` / `google_project_iam_binding`: Role assignments for Vespa Cloud service accounts
 - `google_service_account`: `tenant-host`, `vespa-cloud-enclave-ssh`
+- `google_compute_network`: The global VPC network `vespa`
+- `google_compute_firewall`: Allow health checks from Google ranges, and optionally SSH via IAP
 - `google_compute_health_check`: Global health check for tenant load balancers
+
+### modules/region
+- `google_compute_router` / `google_compute_router_nat`: Cloud Router and Cloud NAT gateway
+- `google_compute_subnetwork`: Proxy-only subnet for regional Envoy-based load balancers
+
+### modules/zone
+- `google_compute_subnetwork`: Tenant host subnet (with secondary node range) and private endpoint forwarding rule subnet
+- `google_compute_firewall`: Allow internal IPv4 and IPv6 traffic
+- `google_compute_region_health_check`: Regional health check for tenant load balancers
+- `google_kms_key_ring` / `google_kms_crypto_key`: Disk and backup encryption keys
+- `google_storage_bucket` and IAM members: Archive and backup buckets
 
 ## Permissions needed by the Terraform runner
 The principal running Terraform must be able to create custom IAM role definitions and bindings,
-service accounts, and enable APIs in the GCP project.
+service accounts, networking resources, KMS keys and Cloud Storage buckets, and enable APIs in the
+GCP project.
 
 Option A (simplest for bootstrap):
 - `roles/owner` on the GCP project
@@ -163,6 +210,10 @@ Option B (least-privilege):
 - `roles/iam.serviceAccountAdmin` (create service accounts)
 - `roles/resourcemanager.projectIamAdmin` (manage IAM bindings)
 - `roles/serviceusage.serviceUsageAdmin` (enable APIs)
+- `roles/compute.networkAdmin` (VPC, subnets, firewall rules, Cloud Router and NAT)
+- `roles/compute.loadBalancerAdmin` (health checks)
+- `roles/cloudkms.admin` (key rings and keys)
+- `roles/storage.admin` (archive and backup buckets)
 
 ## Versioning
 This module follows semantic versioning. Pin a compatible version range when consuming the module, for example:

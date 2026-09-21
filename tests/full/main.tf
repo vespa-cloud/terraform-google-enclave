@@ -27,7 +27,7 @@ module "zone_prod_us_central1_f" {
 }
 
 output "zones" {
-  value = module.enclave.zones
+  value = module.region_us_central1.zones
 }
 
 output "router_name" {
