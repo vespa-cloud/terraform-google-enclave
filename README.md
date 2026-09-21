@@ -23,6 +23,7 @@ This module is published on both the Terraform and OpenTofu registries.
 - Custom IAM roles for the Vespa Cloud provisioner to manage VMs, disks, load balancers, DNS, and networking
 - Custom IAM roles for archive storage (write, delete) and ServiceConnect
 - IAM bindings granting the Vespa Cloud provisioner and service connector the necessary permissions
+- A read-only IAM role letting Vespa Cloud list instances in the project, so instances unknown to its node repository are detected
 - KMS encryption permissions for the Compute Engine service agent
 - A global health check for tenant load balancers
 - Required GCP APIs enabled (Cloud KMS, Cloud Resource Manager, Compute Engine)
@@ -145,7 +146,7 @@ Recommended per-region layout (3 zones):
 
 ## Resources created
 - `google_project_service`: Enables required APIs (Cloud KMS, Cloud Resource Manager, Compute Engine)
-- `google_project_iam_custom_role`: Custom roles for provisioner, SSH, archive write/delete, service connector
+- `google_project_iam_custom_role`: Custom roles for provisioner, inventory (read-only), SSH, archive write/delete, service connector
 - `google_project_iam_member` / `google_project_iam_binding`: Role assignments for Vespa Cloud service accounts
 - `google_service_account`: `tenant-host`, `vespa-cloud-enclave-ssh`
 - `google_compute_health_check`: Global health check for tenant load balancers
