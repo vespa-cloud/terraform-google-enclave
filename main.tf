@@ -111,6 +111,21 @@ resource "google_project_iam_member" "vespa_cloud_provisioner" {
   member  = "serviceAccount:vespa-cloud-provisioner@${var.vespa_cloud_project}.iam.gserviceaccount.com"
 }
 
+resource "google_project_iam_custom_role" "vespa_cloud_inventory_role" {
+  role_id     = "vespa.cloud.inventory"
+  title       = "Allow Vespa Cloud to list instances"
+  description = "Read-only: lets Vespa Cloud detect instances in this project that its node repository does not know about"
+  permissions = [
+    "compute.instances.list",
+  ]
+}
+
+resource "google_project_iam_member" "vespa_cloud_inventory" {
+  project = google_project_iam_custom_role.vespa_cloud_inventory_role.project
+  role    = google_project_iam_custom_role.vespa_cloud_inventory_role.id
+  member  = "serviceAccount:inventory@${var.vespa_cloud_project}.iam.gserviceaccount.com"
+}
+
 resource "google_project_iam_custom_role" "service_connector" {
   role_id     = "service_connect_dns_updater"
   title       = "ServiceConnect maintainer role"
@@ -236,7 +251,7 @@ resource "google_project_iam_custom_role" "backup_object_expiry" {
 locals {
   # NOTE: Do not rename or move this variable!
   # Used by github actions to tag releases. Bump for non-trivial changes.
-  template_version     = "2.1.6"
+  template_version     = "2.2.0"
   template_version_gcp = replace(local.template_version, ".", "_")
 
   globals = {
