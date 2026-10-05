@@ -25,6 +25,7 @@ variable "all_zones" {
   default = [
     { environment = "dev", gcp_region = "us-central1", gcp_zone = "us-central1-a" },
     { environment = "dev", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
+    { environment = "dev", gcp_region = "us-central1", gcp_zone = "us-central1" },
     { environment = "test", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
     { environment = "staging", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
     { environment = "prod", gcp_region = "us-central1", gcp_zone = "us-central1-a" },
