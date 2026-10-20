@@ -28,6 +28,8 @@ variable "all_zones" {
     { environment = "dev", gcp_region = "us-central1", gcp_zone = "us-central1" },
     { environment = "test", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
     { environment = "staging", gcp_region = "us-central1", gcp_zone = "us-central1-f" },
+    { environment = "test", gcp_region = "europe-west1", gcp_zone = "europe-west1" },
+    { environment = "staging", gcp_region = "europe-west1", gcp_zone = "europe-west1" },
     { environment = "prod", gcp_region = "us-central1", gcp_zone = "us-central1-a" },
     { environment = "prod", gcp_region = "us-central1", gcp_zone = "us-central1-b" },
     { environment = "prod", gcp_region = "us-central1", gcp_zone = "us-central1-c" },
