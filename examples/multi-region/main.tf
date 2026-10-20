@@ -62,14 +62,7 @@ module "region_europe_west3" {
 
 #
 # First we set up the two zones that are used for the CI/CD deployment pipeline
-# that Vespa Cloud supports. The test and staging zones in europe-west1 are
-# multi-AZ: a single zone spreads its hosts across all availability zones in
-# the region, which makes it much less likely that a pipeline run stalls on
-# lack of capacity.
-#
-# If you already have test and staging zones in us-central1-f, keep them until
-# Vespa Cloud has confirmed that your pipeline runs in europe-west1.
-#
+# that Vespa Cloud supports.
 module "zone_test_europe_west1" {
   source                       = "vespa-cloud/enclave/google//modules/zone"
   version                      = ">= 2.3.2, < 3.0.0"

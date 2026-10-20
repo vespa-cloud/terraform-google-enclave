@@ -7,4 +7,4 @@ Terraform modules.
 : The most simple minimal example that grants one `dev` zone in the GCP project.
 
 [`multi-region`](./multi-region/)
-: An example that shows a full set up with multi-AZ test and staging zones in europe-west1 for the CI/CD pipeline, and two production zones.
+: An example that shows a full set up with test and staging zones in europe-west1 for the CI/CD pipeline, and two production zones.
