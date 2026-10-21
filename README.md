@@ -71,11 +71,6 @@ gcloud org-policies describe compute.trustedImageProjects \
   --effective
 ```
 
-A policy allowing all image projects needs no change for this constraint. If image projects are restricted,
-have your administrator review the effective policy and allow the applicable projects before provisioning
-hosts. The IAM permissions granted by this module do not override organization policies, and this module
-does not create or modify trusted-image policies.
-
 ## Usage
 Minimal example:
 
