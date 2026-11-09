@@ -60,8 +60,8 @@ Workload Identity). See https://registry.terraform.io/providers/hashicorp/google
 
 If your organization restricts VM image sources with
 [`compute.trustedImageProjects`](https://cloud.google.com/compute/docs/images/restricting-image-access),
-the effective policy on your enclave project must allow the projects that supply Vespa Cloud host images:
-`projects/vespa-external` and `projects/gcp-infra-images`.
+the effective policy on your enclave project must allow the project that supplies Vespa Cloud host images:
+`projects/vespa-external`.
 
 Your organization-policy administrator can inspect the effective policy, including inherited rules:
 
